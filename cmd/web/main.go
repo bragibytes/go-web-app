@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/dedpidgon/go-web-app/handlers"
-	"github.com/dedpidgon/go-web-app/models"
+	"github.com/dedpidgon/go-web-app/pkg/handlers"
+	"github.com/dedpidgon/go-web-app/pkg/models"
 	"log"
 	"net/http"
 	"os"

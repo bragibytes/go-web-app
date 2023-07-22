@@ -16,7 +16,7 @@ const path string = "./templates/"
 var templateCache = make(map[string]*template.Template)
 
 func home_page(c *gin.Context) {
-	if err := render_template(c.Writer, "home", nil); err != nil {
+	if err := render_template(c.Writer, "home", ustate); err != nil {
 		response{
 			false,
 			"could not render the template",

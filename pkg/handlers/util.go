@@ -9,9 +9,10 @@ func Init(r *gin.Engine) error {
 	if err := create_template_cache(); err != nil {
 		return err
 	}
+	ustate = new_user_state()
 	user_crud(r.Group("/users"))
 
-	r.GET("/", home_page)
+	r.GET("/", ustate.soft_cookie_check, home_page)
 
 	return nil
 }

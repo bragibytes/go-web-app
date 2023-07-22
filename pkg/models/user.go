@@ -55,7 +55,7 @@ func (u *User) Create() error {
 }
 
 // Read
-func (u User) All() ([]*User, error) {
+func (u *User) GetAll() ([]*User, error) {
 
 	var results []*User
 	cur, err := users.Find(ctx, bson.M{})
@@ -71,9 +71,9 @@ func (u User) All() ([]*User, error) {
 	}
 	return results, nil
 }
-func (u User) Read() (*User, error) {
+func (u *User) PopulateByID() error {
 	err := users.FindOne(context.TODO(), bson.M{"_id": u.ID}).Decode(&u)
-	return &u, err
+	return err
 }
 
 // Update
@@ -102,15 +102,16 @@ func (u *User) Delete() error {
 func (u *User) bson() ([]byte, error) {
 	return bson.Marshal(u)
 }
-func (u User) Exists() *User {
-	if err := users.FindOne(ctx, bson.M{"name": u.Name}).Decode(u); err != nil {
+func (u *User) Exists() bool {
+	if err := users.FindOne(ctx, bson.M{"name": u.Name}).Decode(&u); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil
+			return false
 		}
 		fmt.Println("!!! you should check out the user.exists() function!!!")
-		return nil
+		return false
 	}
-	return &u
+
+	return true
 }
 func (u *User) PasswordMatches(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))

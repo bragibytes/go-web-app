@@ -1,15 +1,13 @@
 package main
 
 import (
-	"backend/controllers"
-	"backend/models"
 	"context"
 	"fmt"
+	"github.com/dedpidgon/go-web-app/handlers"
+	"github.com/dedpidgon/go-web-app/models"
 	"log"
 	"net/http"
 	"os"
-
-	"backend/views"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -34,18 +32,9 @@ func main() {
 	defer client.Disconnect(context.TODO())
 
 	models.Init(client)
-
 	router := gin.Default()
-	// config := cors.DefaultConfig()
-	// config.AllowOrigins = []string{"http://localhost:4200"}
-	// config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization"}
-	// config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-	// router.Use(cors.New(config))
-	controllers.Init(router.Group("/api/v1/"))
-
-	router.StaticFS("/static", http.Dir("./views/static/"))
-
-	views.Init(router)
+	router.StaticFS("/static", http.Dir("./templates/static/"))
+	handlers.Init(router)
 
 	fmt.Println("Server is running on port ", port)
 	router.Run(port)

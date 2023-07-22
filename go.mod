@@ -1,4 +1,4 @@
-module backend
+module github.com/dedpidgon/go-web-app
 
 go 1.20
 

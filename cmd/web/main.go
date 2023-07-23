@@ -48,6 +48,8 @@ func main() {
 	app.Use(sessions.Sessions("user-session", store))
 	app.Use(controllers.UserController.SetUserData())
 
+	controllers.InitRoutes(app)
+	fmt.Println("Server listining on port ", os.Getenv("PORT"))
 	app.Run(os.Getenv("PORT"))
 }
 

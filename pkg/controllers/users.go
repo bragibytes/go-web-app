@@ -26,25 +26,6 @@ func new_user_controller() *user_controller {
 	return x
 }
 
-// stuff main.go needs
-func (uc *user_controller) SetAuthData() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		ses := sessions.Default(c)
-		name := ses.Get("name")
-		id := ses.Get("id")
-		if name != nil && id != nil {
-			uc.authenticated_user_id = id.(primitive.ObjectID)
-			uc.authenticated_user_name = name.(string)
-			uc.authenticated = true
-		} else {
-			uc.authenticated_user_id = primitive.NilObjectID
-			uc.authenticated_user_name = "anon"
-			uc.authenticated = false
-		}
-		c.Next()
-	}
-}
-
 // routes
 func (uc *user_controller) use(r *gin.RouterGroup) {
 	r.POST("/", uc.create)
@@ -226,6 +207,9 @@ func (uc *user_controller) GetAllUsers() []*models.User {
 		uc.add_error(err)
 	}
 	return users
+}
+func (uc *user_controller) GetIP() string {
+	return uc.ip_address
 }
 
 // helpers

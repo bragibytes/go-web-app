@@ -29,7 +29,3 @@ type response struct {
 func (r response) send(c *gin.Context) {
 	c.JSON(r.Code, r)
 }
-
-func RunApp() {
-
-}

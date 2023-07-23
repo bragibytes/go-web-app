@@ -8,10 +8,8 @@ import (
 
 var ctx = context.TODO()
 
-var users *mongo.Collection
-var posts *mongo.Collection
+var users_collection *mongo.Collection
 
 func Init(c *mongo.Client) {
-	users = c.Database("theThing").Collection("users")
-	posts = c.Database("theThing").Collection("posts")
+	users_collection = c.Database("theThing").Collection("users")
 }

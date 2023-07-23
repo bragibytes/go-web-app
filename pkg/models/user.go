@@ -33,7 +33,7 @@ type User struct {
 }
 
 // Create
-func (u *User) Create() error {
+func (u *User) Save() error {
 	validate := validator.New()
 	// encrypt password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
@@ -49,7 +49,7 @@ func (u *User) Create() error {
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()
 
-	res, err := users.InsertOne(ctx, u)
+	res, err := users_collection.InsertOne(ctx, u)
 	u.ID = res.InsertedID.(primitive.ObjectID)
 	return err
 }
@@ -58,7 +58,7 @@ func (u *User) Create() error {
 func (u *User) GetAll() ([]*User, error) {
 
 	var results []*User
-	cur, err := users.Find(ctx, bson.M{})
+	cur, err := users_collection.Find(ctx, bson.M{})
 	if err != nil {
 		return results, err
 	}
@@ -72,38 +72,29 @@ func (u *User) GetAll() ([]*User, error) {
 	return results, nil
 }
 func (u *User) PopulateByID() error {
-	err := users.FindOne(context.TODO(), bson.M{"_id": u.ID}).Decode(&u)
+	err := users_collection.FindOne(context.TODO(), bson.M{"_id": u.ID}).Decode(&u)
 	return err
 }
 
 // Update
 func (u *User) Update(x *User) error {
-	update, err := x.bson()
-	if err != nil {
-		return err
-	}
 	filter := bson.M{"_id": u.ID}
-	_, err = users.UpdateOne(context.TODO(), filter, bson.M{"$set": update})
+	_, err := users_collection.UpdateOne(context.TODO(), filter, bson.M{"$set": x})
 	if err != nil {
 		return err
 	}
 	return nil
-
 }
 
 // Delete
 func (u *User) Delete() error {
 	filter := bson.M{"_id": u.ID}
-	_, err := users.DeleteOne(context.TODO(), filter)
+	_, err := users_collection.DeleteOne(context.TODO(), filter)
 	return err
 }
 
-// Helpers
-func (u *User) bson() ([]byte, error) {
-	return bson.Marshal(u)
-}
 func (u *User) Exists() bool {
-	if err := users.FindOne(ctx, bson.M{"name": u.Name}).Decode(&u); err != nil {
+	if err := users_collection.FindOne(ctx, bson.M{"name": u.Name}).Decode(&u); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return false
 		}

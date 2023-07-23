@@ -1,4 +1,4 @@
-package handlers
+package controllers
 
 import (
 	"net/http"
@@ -10,8 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type tokens struct{}
-
 // Custom claims for JWT
 type customClaims struct {
 	UserID primitive.ObjectID
@@ -19,7 +17,7 @@ type customClaims struct {
 }
 
 // Middleware to verify JWT and extract user information
-func (t tokens) check() gin.HandlerFunc {
+func check_token() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
 
@@ -47,7 +45,7 @@ func (t tokens) check() gin.HandlerFunc {
 	}
 }
 
-func (t tokens) make(id primitive.ObjectID) (string, error) {
+func make_token(id primitive.ObjectID) (string, error) {
 	expirationTime := time.Now().Add(72 * time.Hour)
 	claims := customClaims{
 		UserID: id,

@@ -3,23 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/dedpidgon/go-web-app/pkg/handlers"
+	"github.com/dedpidgon/go-web-app/pkg/controllers"
 	"github.com/dedpidgon/go-web-app/pkg/models"
-	"log"
-	"net/http"
-	"os"
-
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-)
-
-const (
-	port = ":8000"
+	"log"
+	"net/http"
+	"os"
 )
 
 func main() {
+
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file:", err)
@@ -32,12 +30,25 @@ func main() {
 	defer client.Disconnect(context.TODO())
 
 	models.Init(client)
-	router := gin.Default()
-	router.StaticFS("/static", http.Dir("./templates/static/"))
-	handlers.Init(router)
+	controllers.InitData()
+	store := cookie.NewStore([]byte(os.Getenv("SESSION_KEY")))
+	store.Options(sessions.Options{
+		Path:     "/",
+		Domain:   "localhost",
+		MaxAge:   3600 * 24,              // Set the session age to 1 hour (in seconds)
+		Secure:   controllers.Production, // Set this to true in production to use secure (HTTPS) connections
+		HttpOnly: true,                   // This prevents JavaScript from accessing the cookie
+		SameSite: http.SameSiteLaxMode,
+	})
+	app := gin.Default()
 
-	fmt.Println("Server is running on port ", port)
-	router.Run(port)
+	app.StaticFS("/static", http.Dir("./templates/static/"))
+
+	// middleware
+	app.Use(sessions.Sessions("user-session", store))
+	app.Use(controllers.UserController.SetUserData())
+
+	app.Run(os.Getenv("PORT"))
 }
 
 func connectToDB() (*mongo.Client, error) {

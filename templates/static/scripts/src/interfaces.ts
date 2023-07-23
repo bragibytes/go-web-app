@@ -10,7 +10,7 @@ export interface user {
     updated_at?:Date
 }
 export interface server_response {
-    message_type:number
+    message_type:string
     message:string
     data?:any
     code:number

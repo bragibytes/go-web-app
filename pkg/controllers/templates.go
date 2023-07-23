@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/dedpidgon/go-web-app/pkg/response"
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"io"
@@ -33,11 +34,7 @@ func new_template_controller() *template_controller {
 func (tc *template_controller) home_page(c *gin.Context) {
 
 	if err := tc.render_template(c.Writer, "home", UserController); err != nil {
-		response{
-			"error",
-			err.Error(),
-			nil,
-			500}.send(c)
+		response.ServerErr(c, err)
 		return
 	}
 

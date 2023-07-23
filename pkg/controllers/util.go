@@ -24,14 +24,3 @@ func InitRoutes(r *gin.Engine) {
 	CommentController.use(r.Group("/api/comments"))
 	TemplateController.use(r)
 }
-
-type response struct {
-	MessageType string      `json:"message_type"` //'success', 'warning', 'error', 'info', 'neutral']
-	Message     string      `json:"message"`
-	Data        interface{} `json:"data"`
-	Code        int         `json:"code"`
-}
-
-func (r response) send(c *gin.Context) {
-	c.JSON(r.Code, r)
-}

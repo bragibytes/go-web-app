@@ -13,6 +13,10 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "notie": "^4.3.1"
+    "notie": "^4.3.1",
+    "sweetalert2": "^11.7.20",
+    "ts-loader": "^9.4.4",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
   }
 }

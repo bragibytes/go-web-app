@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/gob"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
 	"os"
@@ -31,6 +33,7 @@ func main() {
 		log.Fatal("Error connecting to mongo...", err.Error())
 	}
 	defer client.Disconnect(context.TODO())
+	gob.Register(primitive.ObjectID{})
 
 	models.Init(client)
 	controllers.InitData()

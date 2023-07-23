@@ -1,9 +1,8 @@
 package controllers
 
 import (
-	"net/http"
-
 	"github.com/dedpidgon/go-web-app/pkg/models"
+	"github.com/dedpidgon/go-web-app/pkg/response"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -42,195 +41,98 @@ func (uc *user_controller) use(r *gin.RouterGroup) {
 func (uc *user_controller) create(c *gin.Context) {
 	var user *models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		response{
-			"warning",
-			err.Error(),
-			nil,
-			http.StatusBadRequest,
-		}.send(c)
+		response.BadReq(c, err)
 		return
 	}
 
 	if err := user.Save(); err != nil {
-		response{
-			"error",
-			err.Error(),
-			nil,
-			http.StatusBadRequest,
-		}.send(c)
+		response.ServerErr(c, err)
 		return
 	}
 
-	response{
-		"success",
-		"User Created!",
-		user,
-		http.StatusCreated,
-	}.send(c)
+	response.Created(c, "user", user)
 }
 func (uc *user_controller) get_one(c *gin.Context) {
 	oid, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		response{
-			"error",
-			err.Error(),
-			nil,
-			http.StatusBadRequest,
-		}.send(c)
+		response.BadReq(c, err)
 		return
 	}
 
 	user, err := models.GetOneUser(oid)
 	if err != nil {
-		response{
-			"error",
-			err.Error(),
-			nil,
-			http.StatusInternalServerError,
-		}.send(c)
+		response.NotFound(c, "user", err.Error())
 		return
 	}
 
-	response{
-		"success",
-		"Got your user!",
-		user,
-		http.StatusOK,
-	}.send(c)
+	response.OK(c, "got your user", user)
 }
 func (uc *user_controller) get_all(c *gin.Context) {
 
 	users, err := models.GetAllUsers()
 	if err != nil {
-		response{
-			"error",
-			err.Error(),
-			nil,
-			http.StatusInternalServerError,
-		}.send(c)
+		response.NotFound(c, "users", err.Error())
 		return
 	}
-	response{
-		"success",
-		"Here are your users!",
-		users,
-		http.StatusOK,
-	}.send(c)
+	response.OK(c, "here are your users", users)
 }
 func (uc *user_controller) update(c *gin.Context) {
 	if !uc.authenticated {
-		response{
-			"warning",
-			"You're not authorized to do that",
-			nil,
-			http.StatusUnauthorized,
-		}.send(c)
+		response.Unauthorized(c, "i cant let you do that")
 		return
 	}
 
 	user, err := models.GetOneUser(uc.authenticated_user_id)
 	if err != nil {
-		response{
-			"error",
-			err.Error(),
-			nil,
-			http.StatusInternalServerError,
-		}.send(c)
+		response.ServerErr(c, err)
 		return
 	}
 	var userUpdate *models.User
 	if err := c.ShouldBindJSON(&userUpdate); err != nil {
-		response{
-			"warning",
-			err.Error(),
-			nil,
-			http.StatusBadRequest,
-		}.send(c)
+		response.BadReq(c, err)
 		return
 	}
 	if err := user.Update(userUpdate); err != nil {
-		response{
-			"error",
-			err.Error(),
-			nil,
-			http.StatusInternalServerError,
-		}.send(c)
+		response.ServerErr(c, err)
 		return
 	}
-	response{
-		"success",
-		"User updated successfully",
-		user,
-		http.StatusOK,
-	}.send(c)
+	response.OK(c, "successfully updated user", user)
 }
 func (uc *user_controller) delete(c *gin.Context) {
 	if !uc.authenticated {
-		response{
-			"warning",
-			"You're not authorized to do that",
-			nil,
-			http.StatusUnauthorized,
-		}.send(c)
+		response.Unauthorized(c, "i cant let you do that")
 		return
 	}
-	user, err := models.GetOneUser(uc.authenticated_user_id)
+	userToDelete, err := models.GetOneUser(uc.authenticated_user_id)
 	if err != nil {
-		response{
-			"error",
-			err.Error(),
-			nil,
-			http.StatusInternalServerError,
-		}.send(c)
+		response.ServerErr(c, err)
 		return
 	}
-	if err := user.Delete(); err != nil {
-		response{
-			"error",
-			err.Error(),
-			nil,
-			http.StatusInternalServerError,
-		}.send(c)
+	if err := userToDelete.Delete(); err != nil {
+		response.ServerErr(c, err)
 		return
 	}
-	response{
-		"success",
-		"User deleted successfully",
-		user,
-		http.StatusOK,
-	}.send(c)
+	response.OK(c, "successfully deleted user", userToDelete)
 }
 
 // authentication
 func (uc *user_controller) login(c *gin.Context) {
 	var user *models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		response{
-			"warning",
-			err.Error(),
-			nil,
-			http.StatusBadRequest}.send(c)
+		response.BadReq(c, err)
 		return
 	}
 
 	// check if username exists
 	existingUser := &models.User{Name: user.Name}
 	if !existingUser.Exists() {
-		response{
-			"warning",
-			"Username not found",
-			nil,
-			http.StatusNotFound}.send(c)
+		response.NotFound(c, "user", "error in login handler")
 		return
 	}
 
 	// if name exists check if password is correct
 	if !existingUser.PasswordMatches(user.Password) {
-		response{
-			"warning",
-			"Incorrect password",
-			nil,
-			http.StatusUnauthorized}.send(c)
+		response.Unauthorized(c, "wrong password")
 		return
 	}
 
@@ -238,32 +140,19 @@ func (uc *user_controller) login(c *gin.Context) {
 	ses.Set("mongo_id", existingUser.ID)
 	ses.Set("username", existingUser.Name)
 	if err := ses.Save(); err != nil {
-		response{
-			"error",
-			"Could not save session",
-			nil,
-			http.StatusInternalServerError,
-		}.send(c)
+		response.ServerErr(c, err)
 		return
 	}
-	response{
-		"success",
-		"Successfully logged in",
-		existingUser,
-		200,
-	}.send(c)
+	response.OK(c, "logged in", existingUser)
 }
 func (uc *user_controller) logout(c *gin.Context) {
 	ses := sessions.Default(c)
-	ses.Set("mongo_id", primitive.NilObjectID)
-	ses.Set("username", "")
-	ses.Save()
-	response{
-		"success",
-		"im not sure if that worked...",
-		nil,
-		200,
-	}.send(c)
+	ses.Clear()
+	if err := ses.Save(); err != nil {
+		response.ServerErr(c, err)
+		return
+	}
+	response.OK(c, "logged out", nil)
 }
 
 // template data

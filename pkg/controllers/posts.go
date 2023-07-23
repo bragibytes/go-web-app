@@ -1,6 +1,11 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/dedpidgon/go-web-app/pkg/models"
+	"github.com/dedpidgon/go-web-app/pkg/response"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type post_controller struct {
 }
@@ -10,11 +15,91 @@ func new_post_controller() *post_controller {
 	return x
 }
 
-func (c *post_controller) use(r *gin.RouterGroup) {
+func (pc *post_controller) use(r *gin.RouterGroup) {
+	r.POST("/", pc.create)
+	r.GET("/", pc.get_all)
+	r.GET("/{id}", pc.get_one)
+	r.PUT("/{id}", pc.update)
+	r.DELETE("/{id}", pc.delete)
+}
+func (pc *post_controller) create(c *gin.Context) {
+	var post *models.Post
+	if err := c.ShouldBindJSON(&post); err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	if err := post.Save(); err != nil {
+		response.ServerErr(c, err)
+		return
+	}
+	response.Created(c, "post", post)
+}
+func (pc *post_controller) get_one(c *gin.Context) {
+	oid, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		response.BadReq(c, err)
+		return
+	}
+
+	post, err := models.GetOnePost(oid)
+	if err != nil {
+		response.ServerErr(c, err)
+		return
+	}
+	response.OK(c, "got the post", post)
+	return
+}
+func (pc *post_controller) get_all(c *gin.Context) {
+
+	posts, err := models.GetAllPosts()
+	if err != nil {
+		response.NotFound(c, "post", err.Error())
+		return
+	}
+	response.OK(c, "got all the posts", posts)
 
 }
-func (pc *post_controller) create(c *gin.Context)   {}
-func (pc *post_controller) read(c *gin.Context)     {}
-func (pc *post_controller) read_all(c *gin.Context) {}
-func (pc *post_controller) update(c *gin.Context)   {}
-func (pc *post_controller) delete(c *gin.Context)   {}
+func (pc *post_controller) update(c *gin.Context) {
+	if !UserController.IsAuthenticated() {
+		response.Unauthorized(c, "i cant let you do that")
+		return
+	}
+	var post *models.Post
+	var postUpdate *models.Post
+	oid, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	post, err = models.GetOnePost(oid)
+	if err != nil {
+		response.NotFound(c, "post", err.Error())
+		return
+	}
+	if err := c.ShouldBindJSON(&postUpdate); err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	if err = post.Update(postUpdate); err != nil {
+		response.ServerErr(c, err)
+		return
+	}
+	response.OK(c, "successfully updated post", post)
+}
+func (pc *post_controller) delete(c *gin.Context) {
+	if !UserController.IsAuthenticated() {
+		response.Unauthorized(c, "i cant let you do that")
+		return
+	}
+	oid, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	postToDelete := &models.Post{ID: oid}
+	if err := postToDelete.Delete(); err != nil {
+		response.ServerErr(c, err)
+		return
+	}
+	response.OK(c, "successfully deleted post", nil)
+}

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/dedpidgon/go-web-app/pkg/models"
+	"github.com/dedpidgon/go-web-app/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,12 +20,12 @@ func (vc *vote_controller) use(r *gin.RouterGroup) {
 func (vc *vote_controller) vote(c *gin.Context) {
 	var vote *models.Vote
 	if err := c.ShouldBindJSON(&vote); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		response.BadReq(c, err)
 		return
 	}
 	if err := vote.DoTheThing(); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		response.ServerErr(c, err)
 		return
 	}
-	c.JSON(200, vote)
+	response.OK(c, "you are a voter!", vote)
 }

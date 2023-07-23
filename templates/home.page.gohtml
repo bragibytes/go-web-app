@@ -1,11 +1,16 @@
 {{template "base" .}}
 
     {{define "content"}}
-        <div>
-            <h1>Home Page!</h1>
+        <div class="container">
+            <div class="row">
+                <h1>Home Page!</h1>
+                {{template "login-form"}}
+                {{if .IsAuthenticated}}
+                    <button id="logout-button">Logout</button>
+                {{end}}
+                <h3>Hi {{.GetIP}} its nice to see you!</h3>
+                <p>you are logged in : {{.IsAuthenticated}}</p>
+            </div>
         </div>
-        {{template "login-form"}}
-        <h3>Hi {{.GetIP}} its nice to see you!</h3>
 
-        <p>you are logged in : {{.IsAuthenticated}}</p>
     {{end}}

@@ -14,11 +14,6 @@ import (
 type template_controller struct {
 	path  string
 	cache map[string]*template.Template
-	data  *template_data
-}
-
-type template_data struct {
-	*user_controller
 }
 
 func (tc *template_controller) use(r *gin.Engine) {
@@ -37,13 +32,9 @@ func new_template_controller() *template_controller {
 
 func (tc *template_controller) home_page(c *gin.Context) {
 
-	tc.data = &template_data{
-		UserController,
-	}
-	if err := tc.render_template(c.Writer, "home", tc.data); err != nil {
+	if err := tc.render_template(c.Writer, "home", UserController); err != nil {
 		response{
-			false,
-			"could not render the template",
+			"error",
 			err.Error(),
 			nil,
 			500}.send(c)

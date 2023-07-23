@@ -1,7 +1,6 @@
 @import "normalize.css";
-@import "skeleton.css";
-h1 {
-  color: red;
+header {
+  border: 2px groove blue;
 }
 
 /*# sourceMappingURL=index.css.map */

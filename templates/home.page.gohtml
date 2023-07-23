@@ -4,8 +4,8 @@
         <div>
             <h1>Home Page!</h1>
         </div>
+        {{template "login-form"}}
+        <h3>Hi {{.GetIP}} its nice to see you!</h3>
 
-
-
-        <p>you are logged in : {{.Authenticated}}</p>
+        <p>you are logged in : {{.IsAuthenticated}}</p>
     {{end}}

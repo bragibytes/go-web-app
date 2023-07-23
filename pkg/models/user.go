@@ -1,7 +1,6 @@
 package models
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -20,14 +19,14 @@ type stats struct {
 	NextLevel  int `bson:"nextLevel"`
 }
 type User struct {
-	ID              primitive.ObjectID `json:"_id" bson:"_id,omitempty" validate:"required"`
+	ID              primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 	Name            string             `json:"name" bson:"name,omitempty" validate:"required, gt=3"`
 	Email           string             `json:"email" bson:"email,omitempty" validate:"required,email"`
 	Password        string             `json:"password,omitempty" bson:"password,omitempty" validate:"required, gt=8"`
 	ConfirmPassword string             `json:"confirmPassword,omitempty" bson:"-" validate:"required,eqfield=Password"`
 	Bio             string             `json:"bio,omitempty" bson:"bio,omitempty"`
-	CreatedAt       time.Time          `json:"created_at" bson:"created_at,omitempty" validate:"required"`
-	UpdatedAt       time.Time          `json:"updated_at" bson:"updated_at,omitempty" validate:"required"`
+	CreatedAt       time.Time          `json:"created_at" bson:"created_at,omitempty"`
+	UpdatedAt       time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
 
 	Stats stats `json:"stats,omitempty" bson:"stats,omitempty"`
 }
@@ -55,31 +54,33 @@ func (u *User) Save() error {
 }
 
 // Read
-func (u *User) GetAll() ([]*User, error) {
+func GetAllUsers() ([]*User, error) {
 
 	var results []*User
 	cur, err := users_collection.Find(ctx, bson.M{})
 	if err != nil {
 		return results, err
 	}
-	for cur.Next(ctx) {
-		var user *User
-		if err := cur.Decode(&user); err != nil {
-			return results, err
-		}
-		results = append(results, user)
+	if err = cur.All(ctx, &results); err != nil {
+		return results, err
 	}
 	return results, nil
 }
-func (u *User) PopulateByID() error {
-	err := users_collection.FindOne(context.TODO(), bson.M{"_id": u.ID}).Decode(&u)
-	return err
+func GetOneUser(id primitive.ObjectID) (*User, error) {
+	var user *User
+	err := users_collection.FindOne(ctx, bson.M{"_id": id}).Decode(&user)
+	return user, err
 }
 
 // Update
 func (u *User) Update(x *User) error {
-	filter := bson.M{"_id": u.ID}
-	_, err := users_collection.UpdateOne(context.TODO(), filter, bson.M{"$set": x})
+	filter := bson.M{
+		"_id": u.ID,
+	}
+	update := bson.M{
+		"$set": x,
+	}
+	_, err := users_collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
 	}
@@ -89,7 +90,7 @@ func (u *User) Update(x *User) error {
 // Delete
 func (u *User) Delete() error {
 	filter := bson.M{"_id": u.ID}
-	_, err := users_collection.DeleteOne(context.TODO(), filter)
+	_, err := users_collection.DeleteOne(ctx, filter)
 	return err
 }
 

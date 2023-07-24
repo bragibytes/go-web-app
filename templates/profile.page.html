@@ -1,7 +1,7 @@
 {{template "base" .}}
 
 {{define "content"}}
-
+    <input type="hidden" id="hidden-package" value="{{.X}}">
 
     <h2>This is the profile page</h2>
     <div class="container">
@@ -15,9 +15,9 @@
     </div>
 
         {{if .IsAuthenticated}}
-            {{if eq .UserID .ID}}
-                <button>Update</button>
-                <button>Delete</button>
+            {{if eq .UserID .U.ID}}
+                <button id="update-button">Update</button>
+                <button id="delete-button">Delete</button>
             {{end}}
         {{end}}
 

@@ -1,18 +1,10 @@
-import {server_response, user} from "../interfaces";
-const POST = "POST"
-const PUT = "PUT"
-const auth_path = "http://localhost:8080/api/users/auth";
-const create_path = "http://localhost:8080/api/users";
+import {user} from "../interfaces";
+import {element_exists} from "./config";
+import { login_user, logout_user, register_user } from "../api";
 
 const login_form_element = document.getElementById("login-form") as HTMLFormElement
 const logout_button_element = document.getElementById("logout-button") as HTMLButtonElement
 const register_form_element = document.getElementById("register-form") as HTMLFormElement
-
-const element_exists = (n:string):boolean => {
-    const ele = document.getElementById(n)
-    return ele == null ? false:true
-}
-import {notify_modal} from "./notifications";
 
 const login_form_handler = () => {
 
@@ -32,42 +24,31 @@ const login_form_handler = () => {
             name: username().value,
             password: password().value
         }
-        const opts = {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json"
+        login_user(data)
+        .then(res=>{
+            if(res.message_type === "success"){
+                window.location.href = "/profile"
+                clear_inputs()
             }
-        }
-        const result = await fetch(auth_path, opts)
-        const response: server_response = await result.json()
-        notify_modal(response.message_type, response.message, response.data , response.code.toString())
-            .then((res)=>{
-                if(response.message_type == "success"){
-                    window.location.href = "/profile"
-                }
-            })
-
-        clear_inputs()
+        })
+        
+            
     }
     login_form_element.addEventListener("submit", onSubmit)
 }
 
-const logout_button_handler = async () => {
-    const opts = {
-        method:"PUT",
-        headers:{
-            "Content-Type":"application/json",
-        }
-    }
-    const result = await fetch(auth_path, opts)
-    const response: server_response = await result.json()
+const logout_button_handler = () => {
 
-    notify_modal(response.message_type, response.message, response.data, response.code.toString())
+    const on_click = async (e:Event) => {
+        
+        logout_user()
         .then(res=>{
-            window.location.replace("/")
-            console.log(res)
+            if(res.message_type === "success"){
+                window.location.replace("/")
+            }
         })
+    }
+    logout_button_element.addEventListener("click", on_click)
 }
 
 const register_form_handler = () => {
@@ -91,16 +72,7 @@ const register_form_handler = () => {
             password:password().value,
             confirm_password:confirm_password().value
         }
-        const opts = {
-            method:POST,
-            body:JSON.stringify(data),
-            headers:{
-                "Content-Type":"application/json",
-            }
-        }
-        const result = await fetch(create_path, opts)
-        const response = await result.json()
-        notify_modal(response.message_type,response.message, response.data, response.code)
+        register_user(data)
     }
     register_form_element.addEventListener("submit", on_submit)
 }
@@ -112,8 +84,8 @@ const run = () => {
     if(element_exists("register-form")){
         register_form_handler()
     }
-    if(logout_button_element !== null){
-        logout_button_element.addEventListener("click", logout_button_handler)
+    if(element_exists("logout-button")){
+        logout_button_handler()
     }
 }
 

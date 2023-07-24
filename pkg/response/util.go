@@ -13,6 +13,11 @@ type response struct {
 	Code        int         `json:"code"`
 }
 
+func Send(c *gin.Context, t string, m string, d interface{}, n int) {
+	x := &response{t, m, d, n}
+	c.JSON(n, x)
+}
+
 func BadReq(c *gin.Context, err error) {
 	res := &response{
 		"warning",

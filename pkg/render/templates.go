@@ -1,6 +1,7 @@
 package render
 
 import (
+	"encoding/json"
 	"github.com/dedpidgon/go-web-app/pkg/controllers"
 	"github.com/dedpidgon/go-web-app/pkg/models"
 	"github.com/dedpidgon/go-web-app/pkg/response"
@@ -31,6 +32,7 @@ func home_page(c *gin.Context) {
 		controllers.UserController,
 		controllers.PostController,
 		nil,
+		"",
 	}
 	if err := render_template(c.Writer, "home", data); err != nil {
 		response.ServerErr(c, err)
@@ -51,6 +53,7 @@ func profile_page(c *gin.Context) {
 			controllers.UserController,
 			controllers.PostController,
 			user,
+			"",
 		}
 	} else {
 		oid, err := primitive.ObjectIDFromHex(param)
@@ -67,8 +70,15 @@ func profile_page(c *gin.Context) {
 			controllers.UserController,
 			controllers.PostController,
 			user,
+			"",
 		}
 	}
+	bytes, err := json.Marshal(&data.U)
+	if err != nil {
+		response.Send(c, "info", err.Error(), bytes, 400)
+		return
+	}
+	data.X = string(bytes)
 	if err := render_template(c.Writer, "profile", data); err != nil {
 		response.ServerErr(c, err)
 		return

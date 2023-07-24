@@ -61,8 +61,8 @@ func (p *Post) Update(x *Post) error {
 	err := posts_collection.FindOneAndUpdate(ctx, bson.M{"_id": p.ID}, bson.M{"$set": x}).Decode(&p)
 	return err
 }
-func DeletePost(id primitive.ObjectID) error {
-	_, err := posts_collection.DeleteOne(ctx, bson.M{"_id": id})
+func (p *Post) Delete() error {
+	_, err := posts_collection.DeleteOne(ctx, bson.M{"_id": p.ID})
 	return err
 }
 

@@ -3,17 +3,19 @@ package render
 import (
 	"bytes"
 	"fmt"
-	"github.com/dedpidgon/go-web-app/pkg/models"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"html/template"
 	"io"
 	"path/filepath"
+
+	"github.com/dedpidgon/go-web-app/pkg/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type template_data struct {
 	user_view
 	post_view
 	U *models.User
+	X string
 }
 
 type user_view interface {
@@ -41,7 +43,7 @@ func new_error(t string) *template_error {
 }
 
 func render_template(w io.Writer, t string, data interface{}) error {
-	name := fmt.Sprintf("%s.page.gohtml", t)
+	name := fmt.Sprintf("%s.page.html", t)
 
 	_, ok := cache[name]
 	if !ok {
@@ -61,7 +63,7 @@ func render_template(w io.Writer, t string, data interface{}) error {
 
 func create_template_cache() error {
 
-	pages, err := filepath.Glob(path + "*.page.gohtml")
+	pages, err := filepath.Glob(path + "*.page.html")
 	if err != nil {
 		return err
 	}
@@ -73,24 +75,24 @@ func create_template_cache() error {
 			return err
 		}
 
-		layouts, err := filepath.Glob(path + "*.layout.gohtml")
+		layouts, err := filepath.Glob(path + "*.layout.html")
 		if err != nil {
 			return err
 		}
 		if len(layouts) > 0 {
-			ts, err = ts.ParseGlob(path + "*.layout.gohtml")
+			ts, err = ts.ParseGlob(path + "*.layout.html")
 			if err != nil {
 				return err
 			}
 		}
 
-		partials, err := filepath.Glob(path + "*.partial.gohtml")
+		partials, err := filepath.Glob(path + "*.partial.html")
 		if err != nil {
 			return err
 		}
 
 		if len(partials) > 0 {
-			ts, err = ts.ParseGlob(path + "*.partial.gohtml")
+			ts, err = ts.ParseGlob(path + "*.partial.html")
 			if err != nil {
 				return err
 			}

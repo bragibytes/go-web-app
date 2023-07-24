@@ -4,7 +4,9 @@
         <div class="container">
             <div class="row">
                 <h1>Home Page!</h1>
+                {{template "user-list" .GetAllUsers}}
                 {{template "login-form"}}
+                {{template "register-form"}}
                 {{if .IsAuthenticated}}
                     <button id="logout-button">Logout</button>
                 {{end}}

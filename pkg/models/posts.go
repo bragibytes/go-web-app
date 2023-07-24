@@ -16,6 +16,7 @@ type Post struct {
 	CommentIDs []primitive.ObjectID `json:"comments" bson:"comments,omitempty"`
 	CreatedAt  time.Time            `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt  time.Time            `json:"updated_at" bson:"updated_at,omitempty"`
+	Errors     []string
 
 	Score int32 `json:"score" bson:"-"`
 }
@@ -60,9 +61,22 @@ func (p *Post) Update(x *Post) error {
 	err := posts_collection.FindOneAndUpdate(ctx, bson.M{"_id": p.ID}, bson.M{"$set": x}).Decode(&p)
 	return err
 }
-func (p *Post) Delete() error {
-	_, err := posts_collection.DeleteOne(ctx, bson.M{"_id": p.ID})
+func DeletePost(id primitive.ObjectID) error {
+	_, err := posts_collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err
+}
+
+// template data
+func (p *Post) Comments() []*Comment {
+	var comments []*Comment
+	for _, id := range p.CommentIDs {
+		var comment *Comment
+		if err := comments_collection.FindOne(ctx, bson.M{"_id": id}).Decode(&comment); err != nil {
+			p.Errors = append(p.Errors, err.Error())
+		}
+		comments = append(comments, comment)
+	}
+	return comments
 }
 
 func (p *Post) add_to_score()              { p.Score += 1 }

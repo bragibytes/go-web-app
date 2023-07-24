@@ -15,6 +15,27 @@ export interface server_response {
     data?:any
     code:number
 }
+export interface post {
+    _id?:string
+    _author?:string
+    title?:string
+    content?:string
+    comment_ids?:string[]
+    created_at?:Date
+    updated_at?:Date
+}
+
+// type Post struct {
+//     ID         primitive.ObjectID   `json:"_id" bson:"_id,omitempty"`
+//     Author     primitive.ObjectID   `json:"_author" bson:"_author,omitempty"`
+//     Title      string               `json:"title" bson:"title,omitempty" validate:"required" min:"3" max:"200"`
+//     Content    string               `json:"content" bson:"content,omitempty" validate:"required" min:"5" max:"10000"`
+//     CommentIDs []primitive.ObjectID `json:"comments" bson:"comments,omitempty"`
+//     CreatedAt  time.Time            `json:"created_at" bson:"created_at,omitempty"`
+//     UpdatedAt  time.Time            `json:"updated_at" bson:"updated_at,omitempty"`
+//
+//     Score int32 `json:"score" bson:"-"`
+// }
 
 // ID              primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 // Name            string             `json:"name" bson:"name,omitempty" validate:"required, gt=3"`

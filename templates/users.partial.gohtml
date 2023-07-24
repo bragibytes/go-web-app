@@ -1,0 +1,18 @@
+{{define "user"}}
+    <div class="user">
+        <h2>{{.Name}}</h2>
+    </div>
+{{end}}
+
+{{define "user-list"}}
+
+    <ul>
+        {{range .}}
+            <a href="/profile/{{.ID.Hex}}"><li>{{template "user" .}}</li></a>
+        {{end}}
+    </ul>
+{{end}}
+
+{{define "user-update"}}
+    <form id="user-update-form"></form>
+{{end}}

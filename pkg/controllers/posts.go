@@ -8,6 +8,7 @@ import (
 )
 
 type post_controller struct {
+	errors []string
 }
 
 func new_post_controller() *post_controller {
@@ -102,4 +103,30 @@ func (pc *post_controller) delete(c *gin.Context) {
 		return
 	}
 	response.OK(c, "successfully deleted post", nil)
+}
+
+// template data
+func (pc *post_controller) GetAllPosts() []*models.Post {
+	posts, err := models.GetAllPosts()
+	if err != nil {
+		pc.add_error(err)
+		return nil
+	}
+	return posts
+}
+func (pc *post_controller) PostErrors() []string {
+	return pc.errors
+}
+func (pc *post_controller) Comments() []*models.Comment {
+	comments, err := models.GetAllComments()
+	if err != nil {
+		pc.add_error(err)
+		return nil
+	}
+	return comments
+}
+
+// helpers
+func (pc *post_controller) add_error(err error) {
+	pc.errors = append(pc.errors, err.Error())
 }

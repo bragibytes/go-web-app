@@ -1,0 +1,25 @@
+{{define "login-form"}}
+
+    <form id="login-form" class="container">
+        <div class="row">
+            <input type="text" placeholder="username" name="username"/>
+            <input type="password" placeholder="password" name="password"/>
+            <input class="button button-primary" type="submit" value="Login!"/>
+        </div>
+    </form>
+
+{{end}}
+
+{{define "register-form"}}
+
+    <form id="register-form" class="container">
+        <div class="row">
+            <input type="text" placeholder="username" name="username"/>
+            <input type="email" placeholder="email" name="email"/>
+            <input type="password" placeholder="password" name="password"/>
+            <input type="password" placeholder="confirm password" name="password"/>
+            <input class="button button-primary" type="submit" value="Register!"/>
+        </div>
+    </form>
+
+{{end}}

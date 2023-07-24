@@ -16,8 +16,21 @@ type stats struct {
 	Health     int `bson:"health"`
 	Energy     int `bson:"energy"`
 	Experience int `bson:"experience"`
-	NextLevel  int `bson:"nextLevel"`
+	NextLevel  int `bson:"next_level"`
 }
+
+func new_stats() *stats {
+	x := &stats{
+		1,
+		100,
+		100,
+		0,
+		150,
+	}
+
+	return x
+}
+
 type User struct {
 	ID              primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 	Name            string             `json:"name" bson:"name,omitempty" validate:"required, gt=3"`
@@ -28,7 +41,11 @@ type User struct {
 	CreatedAt       time.Time          `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt       time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
 
-	Stats stats `json:"stats,omitempty" bson:"stats,omitempty"`
+	Stats *stats `json:"stats,omitempty" bson:"stats,omitempty"`
+}
+
+func (u *User) StringID() string {
+	return u.ID.Hex()
 }
 
 // Create
@@ -47,6 +64,7 @@ func (u *User) Save() error {
 	// save to database
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()
+	u.Stats = new_stats()
 
 	res, err := users_collection.InsertOne(ctx, u)
 	u.ID = res.InsertedID.(primitive.ObjectID)

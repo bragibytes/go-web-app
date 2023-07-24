@@ -1,6 +1,22 @@
 @import "normalize.css";
+@import "skeleton.css";
+body {
+  background-image: linear-gradient(to bottom, tan, white);
+  background-repeat: no-repeat;
+}
+
+h1 {
+  color: darkred;
+}
+
 header {
-  border: 2px groove blue;
+  border-bottom: 2px groove darkblue;
+}
+
+nav ul {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 /*# sourceMappingURL=index.css.map */

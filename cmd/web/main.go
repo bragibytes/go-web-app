@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"github.com/dedpidgon/go-web-app/pkg/render"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
@@ -36,7 +37,7 @@ func main() {
 	gob.Register(primitive.ObjectID{})
 
 	models.Init(client)
-	controllers.InitData()
+	controllers.Init()
 	store := cookie.NewStore([]byte(os.Getenv("SESSION_KEY")))
 	store.Options(sessions.Options{
 		Path:     "/",
@@ -54,7 +55,8 @@ func main() {
 	app.Use(sessions.Sessions("user-session", store))
 	app.Use(controllers.UserController.SetUserData())
 
-	controllers.InitRoutes(app)
+	controllers.Handle(app)
+	render.Handle(app)
 	fmt.Println("Server listening on port ", os.Getenv("PORT"))
 	app.Run(os.Getenv("PORT"))
 }

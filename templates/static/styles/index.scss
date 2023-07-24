@@ -1,7 +1,31 @@
 @import "normalize.css";
-// @import "skeleton.css";
+@import "skeleton.css";
 
 
+$primary-color:tan;
+$secondary-color:darkblue;
+$trinary-color:darkred;
+
+
+body {
+    background-image: linear-gradient(to bottom,$primary-color , white);
+    background-repeat: no-repeat;
+}
+
+h1 {
+    color:$trinary-color;
+}
 header {
-    border:2px groove blue;
+    border-bottom:2px groove $secondary-color;
+}
+
+nav {
+    ul {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        li {
+
+        }
+    }
 }

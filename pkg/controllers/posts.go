@@ -16,19 +16,26 @@ func new_post_controller() *post_controller {
 	return x
 }
 
+// /api/posts
 func (pc *post_controller) use(r *gin.RouterGroup) {
-	r.POST("/", pc.create)
+	r.POST("/:id", pc.create)
 	r.GET("/", pc.get_all)
-	r.GET("/{id}", pc.get_one)
-	r.PUT("/{id}", pc.update)
-	r.DELETE("/{id}", pc.delete)
+	r.GET("/:id", pc.get_one)
+	r.PUT("/:id", pc.update)
+	r.DELETE("/:id", pc.delete)
 }
 func (pc *post_controller) create(c *gin.Context) {
 	var post *models.Post
+	oid, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		response.BadReq(c, err)
+		return
+	}
 	if err := c.ShouldBindJSON(&post); err != nil {
 		response.BadReq(c, err)
 		return
 	}
+	post.Author = oid
 	if err := post.Save(); err != nil {
 		response.ServerErr(c, err)
 		return

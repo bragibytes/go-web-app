@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"sort"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -27,6 +28,17 @@ type voteable interface {
 	add_to_score()
 	subtract_from_score()
 	get_id() primitive.ObjectID
+}
+
+func sort_comments(comments []*Comment) {
+	sort.Slice(comments, func(i, j int) bool {
+		return comments[i].Score > comments[j].Score
+	})
+}
+func sort_posts(posts []*Post) {
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].Score > posts[j].Score
+	})
 }
 
 func calculate_score(v voteable) error {

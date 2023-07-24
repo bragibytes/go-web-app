@@ -13,7 +13,6 @@ export interface server_response {
     message_type:string
     message:string
     data?:any
-    code:number
 }
 export interface post {
     _id?:string

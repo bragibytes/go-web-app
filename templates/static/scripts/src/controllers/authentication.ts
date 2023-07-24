@@ -1,10 +1,14 @@
-import {user} from "../interfaces";
-import {element_exists} from "./config";
-import { login_user, logout_user, register_user } from "../api";
+const login_form = "login-form"
+const register_form = "register-form"
+const logout_button = "logout-button"
 
-const login_form_element = document.getElementById("login-form") as HTMLFormElement
-const logout_button_element = document.getElementById("logout-button") as HTMLButtonElement
-const register_form_element = document.getElementById("register-form") as HTMLFormElement
+const login_form_element = document.getElementById(login_form) as HTMLFormElement
+const logout_button_element = document.getElementById(logout_button) as HTMLButtonElement
+const register_form_element = document.getElementById(register_form) as HTMLFormElement
+
+import {user} from "../interfaces";
+import { login_user, logout_user, register_user } from "../api";
+import { element_exists } from "./config";
 
 const login_form_handler = () => {
 
@@ -18,23 +22,15 @@ const login_form_handler = () => {
         username().value = ""
         password().value = ""
     }
-    const onSubmit = async (e: Event) => {
+    const on_submit = async (e: Event) => {
         e.preventDefault()
         let data: user = {
             name: username().value,
             password: password().value
         }
-        login_user(data)
-        .then(res=>{
-            if(res.message_type === "success"){
-                window.location.href = "/profile"
-                clear_inputs()
-            }
-        })
-        
-            
+        login_user(data) 
     }
-    login_form_element.addEventListener("submit", onSubmit)
+    login_form_element.addEventListener("submit", on_submit)
 }
 
 const logout_button_handler = () => {
@@ -42,11 +38,6 @@ const logout_button_handler = () => {
     const on_click = async (e:Event) => {
         
         logout_user()
-        .then(res=>{
-            if(res.message_type === "success"){
-                window.location.replace("/")
-            }
-        })
     }
     logout_button_element.addEventListener("click", on_click)
 }
@@ -78,13 +69,13 @@ const register_form_handler = () => {
 }
 
 const run = () => {
-    if(element_exists("login-form")){
+    if(element_exists(login_form)) {
         login_form_handler()
     }
-    if(element_exists("register-form")){
+    if(element_exists(register_form)){
         register_form_handler()
     }
-    if(element_exists("logout-button")){
+    if(element_exists(logout_button)){
         logout_button_handler()
     }
 }

@@ -127,3 +127,8 @@ func (u *User) PasswordMatches(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	return err == nil
 }
+
+func (u *User) AsJsonString() string {
+	b, _ := bson.Marshal(u)
+	return string(b)
+}

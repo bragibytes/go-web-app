@@ -4,18 +4,37 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"io"
 	"path/filepath"
 
+	"github.com/dedpidgon/go-web-app/pkg/controllers"
 	"github.com/dedpidgon/go-web-app/pkg/models"
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type template_data struct {
+const path = "./templates/"
+
+var cache = make(map[string]*template.Template)
+var data *stuff
+
+func standard_stuff() *stuff {
+	return &stuff{
+		controllers.UserController,
+		controllers.PostController,
+		nil,
+		nil,
+		"",
+		limit_text,
+	}
+}
+
+type stuff struct {
 	user_view
 	post_view
-	U *models.User
-	X string
+	U         *models.User
+	P         *models.Post
+	X         string
+	LimitText func(string, int) string
 }
 
 type user_view interface {
@@ -42,7 +61,7 @@ func new_error(t string) *template_error {
 	return &template_error{t}
 }
 
-func render_template(w io.Writer, t string, data interface{}) error {
+func render_template(c *gin.Context, t string) error {
 	name := fmt.Sprintf("%s.page.html", t)
 
 	_, ok := cache[name]
@@ -55,7 +74,7 @@ func render_template(w io.Writer, t string, data interface{}) error {
 		return err
 	}
 
-	if _, err := buf.WriteTo(w); err != nil {
+	if _, err := buf.WriteTo(c.Writer); err != nil {
 		return err
 	}
 	return nil
@@ -101,4 +120,11 @@ func create_template_cache() error {
 
 	}
 	return nil
+}
+
+func limit_text(s string, maxLength int) string {
+	if len(s) <= maxLength {
+		return s
+	}
+	return s[:maxLength] + "..."
 }

@@ -29,21 +29,9 @@ func (c *Comment) Save() error {
 	if err != nil {
 		return err
 	}
-	c.connect_to_parent()
+
 	c.ID = res.InsertedID.(primitive.ObjectID)
 	return nil
-}
-func (c *Comment) connect_to_parent() error {
-	filter := bson.M{"_id": c.Parent}
-	update := bson.M{"$push": bson.M{"comments": c.ID}}
-	_, err := posts_collection.UpdateOne(ctx, filter, update)
-	return err
-}
-func (c *Comment) disconnect_from_parent() error {
-	filter := bson.M{"_id": c.Parent}
-	update := bson.M{"$pull": bson.M{"comments": c.ID}}
-	_, err := posts_collection.UpdateOne(ctx, filter, update)
-	return err
 }
 func GetAllComments() ([]*Comment, error) {
 	var comments []*Comment
@@ -76,7 +64,6 @@ func (c *Comment) Delete() error {
 	if err != nil {
 		return err
 	}
-	err = c.disconnect_from_parent()
 	return err
 }
 

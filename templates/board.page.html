@@ -1,0 +1,9 @@
+{{template "base" .}}
+
+{{define "content"}}
+
+    <h1>This is the Board Page!!!</h1>
+
+    {{template "post-list" .GetAllPosts}}
+    {{if .IsAuthenticated}} {{template "post-creator" .UserID}} {{end}}
+{{end}}

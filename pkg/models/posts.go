@@ -9,14 +9,13 @@ import (
 )
 
 type Post struct {
-	ID         primitive.ObjectID   `json:"_id" bson:"_id,omitempty"`
-	Author     primitive.ObjectID   `json:"_author" bson:"_author,omitempty"`
-	Title      string               `json:"title" bson:"title,omitempty" validate:"required" min:"3" max:"200"`
-	Content    string               `json:"content" bson:"content,omitempty" validate:"required" min:"5" max:"10000"`
-	CommentIDs []primitive.ObjectID `json:"comments" bson:"comments,omitempty"`
-	CreatedAt  time.Time            `json:"created_at" bson:"created_at,omitempty"`
-	UpdatedAt  time.Time            `json:"updated_at" bson:"updated_at,omitempty"`
-	Errors     []string
+	ID        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Author    primitive.ObjectID `json:"_author" bson:"_author,omitempty"`
+	Title     string             `json:"title" bson:"title,omitempty" validate:"required" min:"3" max:"200"`
+	Content   string             `json:"content" bson:"content,omitempty" validate:"required" min:"5" max:"10000"`
+	CreatedAt time.Time          `json:"created_at" bson:"created_at,omitempty"`
+	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
+	Errors    []string
 
 	Score int32 `json:"score" bson:"-"`
 }
@@ -48,6 +47,7 @@ func GetAllPosts() ([]*Post, error) {
 	for _, post := range posts {
 		calculate_score(post)
 	}
+	sort_posts(posts)
 	return posts, nil
 }
 func GetOnePost(id primitive.ObjectID) (*Post, error) {
@@ -66,17 +66,30 @@ func (p *Post) Delete() error {
 	return err
 }
 
+func (p *Post) AsJsonString() string {
+	b, err := bson.Marshal(p)
+	if err != nil {
+		return ""
+	}
+	return string(b)
+}
+
 // template data
 func (p *Post) Comments() []*Comment {
 	var comments []*Comment
-	for _, id := range p.CommentIDs {
-		var comment *Comment
-		if err := comments_collection.FindOne(ctx, bson.M{"_id": id}).Decode(&comment); err != nil {
-			p.Errors = append(p.Errors, err.Error())
-		}
-		comments = append(comments, comment)
+	cur, err := comments_collection.Find(ctx, bson.M{"_parent": p.ID})
+	if err != nil {
+		p.Errors = append(p.Errors, err.Error())
 	}
-	return comments
+	if err = cur.All(ctx, &comments); err != nil {
+		p.Errors = append(p.Errors, err.Error())
+	}
+	if comments != nil {
+		sort_comments(comments)
+		return comments
+	} else {
+		return []*Comment{}
+	}
 }
 
 func (p *Post) add_to_score()              { p.Score += 1 }

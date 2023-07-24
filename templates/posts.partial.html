@@ -1,0 +1,38 @@
+{{define "post"}}
+    <div class="container">
+        <h4 class="row">{{.Title}}</h4>
+        <p class="row">{{.Content}}</p>
+        <div class="row">
+            <h5>Comments : {{len .Comments}}</h5>
+            <h5>Score : {{.Score}}</h5>
+        </div>
+    </div>
+    
+{{end}}
+
+{{define "post-list"}}
+    <ul class="container">
+        {{if .}}
+            {{range .}}
+                <li class="row">{{template "post" .}}</li>
+            {{end}}
+        {{else}}
+            <li class="row">No posts</li>
+        {{end}}
+    </ul>
+{{end}}
+
+{{ define "post-creator"}}
+    <form id="post-creator">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input name="title" type="text" class="form-control" id="title" placeholder="Title">
+        </div>
+        <div class="form-group">
+            <label for="content">Content</label>
+            <textarea name="content" class="form-control" id="content" rows="3"></textarea>
+        </div>
+        <input type="hidden" name="author" value="{{.Hex}}">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{{end}}

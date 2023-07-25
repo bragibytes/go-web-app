@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
-	"github.com/dedpidgon/go-web-app/pkg/render"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/dedpidgon/go-web-app/pkg/render"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/dedpidgon/go-web-app/pkg/config"
 	"github.com/dedpidgon/go-web-app/pkg/controllers"
@@ -26,10 +27,10 @@ func main() {
 	config.Init()
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Println("Error loading .env file:", err)
+		log.Fatal("Error loading .env file:", err)
 	}
 
-	client, err := connectToDB()
+	client, err := connect_to_database()
 	if err != nil {
 		log.Fatal("Error connecting to mongo...", err.Error())
 	}
@@ -61,7 +62,7 @@ func main() {
 	app.Run(os.Getenv("PORT"))
 }
 
-func connectToDB() (*mongo.Client, error) {
+func connect_to_database() (*mongo.Client, error) {
 	// Replace the connection string with your MongoDB Atlas connection string
 	connectionString := os.Getenv("MONGO_URI")
 

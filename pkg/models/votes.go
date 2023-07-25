@@ -22,7 +22,7 @@ func (v *Vote) DoTheThing() error {
 	// check if the vote already exists
 	filter := bson.M{"_author": v.Author, "_parent": v.Parent}
 	if err := votes_collection.FindOne(ctx, filter).Decode(&xvote); err != nil {
-		// does not exist
+		// does not exist, create new vote
 		v.CreatedAt = time.Now()
 		v.UpdatedAt = time.Now()
 		res, err := votes_collection.InsertOne(ctx, v)
@@ -31,12 +31,14 @@ func (v *Vote) DoTheThing() error {
 		}
 		v.ID = res.InsertedID.(primitive.ObjectID)
 	} else {
+		// already exists
 		if v.IsUpvote == xvote.IsUpvote {
 			// clicked the same vote button, delete the vote
 			if err := xvote.delete(); err != nil {
 				return err
 			}
 		} else {
+			// clicked a different vote button, update the vote
 			update := bson.M{"$set": bson.M{"is_upvote": !v.IsUpvote, "updated_at": time.Now()}}
 			filter := bson.M{"_id": v.ID}
 			_, err := votes_collection.UpdateOne(ctx, filter, update)
@@ -44,7 +46,6 @@ func (v *Vote) DoTheThing() error {
 				return err
 			}
 		}
-
 	}
 
 	return nil

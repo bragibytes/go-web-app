@@ -19,10 +19,45 @@ export interface post {
     _author?:string
     title?:string
     content?:string
-    comment_ids?:string[]
+    created_at?:Date
+    updated_at?:Date
+    score?:number
+}
+
+export interface vote {
+    _id?:string
+    _author?:string
+    _parent?:string
+    is_upvote?:boolean
     created_at?:Date
     updated_at?:Date
 }
+export interface comment {
+    _id?:string
+    _author?:string
+    _parent?:string
+    content?:string
+    created_at?:Date
+    updated_at?:Date
+    score?:number
+}
+// type Comment struct {
+// 	ID        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+// 	Author    primitive.ObjectID `json:"_author" bson:"_author"`
+// 	Parent    primitive.ObjectID `json:"_parent" bson:"_parent"`
+// 	Content   string             `json:"content" bson:"content" validate:"required" min:"3" max:"255"`
+// 	CreatedAt time.Time          `json:"created_at" bson:"created_at,omitempty"`
+// 	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
+// 	Score     int32              `json:"score" bson:"score,omitempty"`
+// }
+// type Vote struct {
+// 	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+// 	Author    primitive.ObjectID `json:"_author" bson:"_author"`
+// 	Parent    primitive.ObjectID `json:"_parent" bson:"_parent"`
+// 	IsUpvote  bool               `json:"is_upvote" bson:"is_upvote"`
+// 	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
+// 	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at"`
+// }
 
 // type Post struct {
 //     ID         primitive.ObjectID   `json:"_id" bson:"_id,omitempty"`

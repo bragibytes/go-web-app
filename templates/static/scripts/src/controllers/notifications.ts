@@ -8,11 +8,11 @@ export const notify = (msg:string, msgType:string) => {
         text: msg,
     })
 }
-export const notify_modal = (icon:string, title:string, text:string, footer:string): Promise<SweetAlertResult<any>> => {
+export const notify_modal = (icon:string, title:string, text:string, html:string): Promise<SweetAlertResult<any>> => {
     return Swal.fire({
         icon: icon as SweetAlertIcon,
         title: title,
         text: text,
-        footer: footer
+        html: html
     })
 }

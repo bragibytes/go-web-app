@@ -6,8 +6,11 @@
             <h5>Comments : {{len .Comments}}</h5>
             <h5>Score : {{.Score}}</h5>
         </div>
+        <div class="vote-box row">
+            <button is-upvote="true" parent="{{.ID}}" >Upvote</button>
+            <button is-upvote="false" parent="{{.ID}}" >Downvote</button>
+        </div>
     </div>
-    
 {{end}}
 
 {{define "post-list"}}

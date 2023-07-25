@@ -44,16 +44,16 @@ const logout_button_handler = () => {
 
 const register_form_handler = () => {
     const username = (): HTMLInputElement => {
-        return login_form_element.querySelector(`[name="username"]`) as HTMLInputElement
+        return register_form_element.querySelector(`[name="username"]`) as HTMLInputElement
     }
     const password = (): HTMLInputElement => {
-        return login_form_element.querySelector(`[name="password"]`) as HTMLInputElement
+        return register_form_element.querySelector(`[name="password"]`) as HTMLInputElement
     }
     const email = (): HTMLInputElement => {
-        return login_form_element.querySelector(`[name="email"]`) as HTMLInputElement
+        return register_form_element.querySelector(`[name="email"]`) as HTMLInputElement
     }
     const confirm_password = (): HTMLInputElement => {
-        return login_form_element.querySelector(`[name="confirm_password"]`) as HTMLInputElement
+        return register_form_element.querySelector(`[name="confirm-password"]`) as HTMLInputElement
     }
     const on_submit = async (e:Event) => {
         e.preventDefault()

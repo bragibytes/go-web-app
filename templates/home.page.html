@@ -5,8 +5,8 @@
             <div class="row">
                 <h1>Home Page!</h1>
                 {{template "user-list" .GetAllUsers}}
-                {{template "login-form"}}
-                {{template "register-form"}}
+                {{template "login-form" .IsAuthenticated}}
+                {{template "register-form" .IsAuthenticated}}
                 {{if .IsAuthenticated}}
                     <button id="logout-button">Logout</button>
                 {{end}}

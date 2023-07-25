@@ -4,6 +4,7 @@ import (
 	"context"
 	"sort"
 
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -11,7 +12,7 @@ import (
 
 var DatabaseName string = "theThing"
 var ctx = context.TODO()
-
+var validate *validator.Validate
 var users_collection *mongo.Collection
 var posts_collection *mongo.Collection
 var comments_collection *mongo.Collection
@@ -22,6 +23,7 @@ func Init(c *mongo.Client) {
 	posts_collection = c.Database(DatabaseName).Collection("posts")
 	comments_collection = c.Database(DatabaseName).Collection("comments")
 	votes_collection = c.Database(DatabaseName).Collection("votes")
+	validate = validator.New()
 }
 
 type voteable interface {

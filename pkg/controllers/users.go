@@ -45,6 +45,11 @@ func (uc *user_controller) create(c *gin.Context) {
 		return
 	}
 
+	if validation_errors := user.Validate(); len(validation_errors) > 0 {
+		response.ValidationErrors(c, validation_errors)
+		return
+	}
+
 	if err := user.Save(); err != nil {
 		response.ServerErr(c, err)
 		return

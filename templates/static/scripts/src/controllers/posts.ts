@@ -1,9 +1,13 @@
 const post_creator = "post-creator"
+const vote_box = "vote-box"
 
 const post_creator_element = document.getElementById(post_creator) as HTMLFormElement;
+const vote_box_element = document.getElementById(vote_box) as HTMLDivElement;
 
-import { create_post } from "../api";
-import { post } from "../interfaces";
+import { 
+    create_post,
+ } from "../api";
+import { post} from "../interfaces";
 import { element_exists } from "./config";
 
 const post_creator_handler = () => {

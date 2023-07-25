@@ -7,8 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	success  = "success"
+	warning  = "warning"
+	breaking = "error"
+	info     = "info"
+)
+
 type response struct {
-	MessageType string      `json:"message_type"` //'success', 'warning', 'error', 'info', 'neutral']
+	MessageType string      `json:"message_type"`
 	Message     string      `json:"message"`
 	Data        interface{} `json:"data"`
 }
@@ -18,9 +25,18 @@ func Send(c *gin.Context, t string, m string, d interface{}, n int) {
 	c.JSON(n, x)
 }
 
+func ValidationErrors(c *gin.Context, errors []string) {
+	res := &response{
+		warning,
+		"Validation Errors",
+		errors,
+	}
+	c.JSON(http.StatusBadRequest, res)
+}
+
 func BadReq(c *gin.Context, err error) {
 	res := &response{
-		"warning",
+		warning,
 		err.Error(),
 		nil,
 	}
@@ -28,7 +44,7 @@ func BadReq(c *gin.Context, err error) {
 }
 func ServerErr(c *gin.Context, err error) {
 	res := &response{
-		"error",
+		breaking,
 		err.Error(),
 		nil,
 	}
@@ -36,7 +52,7 @@ func ServerErr(c *gin.Context, err error) {
 }
 func Unauthorized(c *gin.Context, msg string) {
 	res := &response{
-		"warning",
+		warning,
 		capitalize_words(msg),
 		nil,
 	}
@@ -44,7 +60,7 @@ func Unauthorized(c *gin.Context, msg string) {
 }
 func OK(c *gin.Context, msg string, data interface{}) {
 	res := &response{
-		"success",
+		success,
 		capitalize_words(msg),
 		data,
 	}
@@ -52,7 +68,7 @@ func OK(c *gin.Context, msg string, data interface{}) {
 }
 func Created(c *gin.Context, t string, data interface{}) {
 	res := &response{
-		"success",
+		success,
 		capitalize(t) + " Created!",
 		data,
 	}
@@ -60,7 +76,7 @@ func Created(c *gin.Context, t string, data interface{}) {
 }
 func NotFound(c *gin.Context, x string, err string) {
 	res := &response{
-		"error",
+		warning,
 		capitalize_words("could not find the " + x + " you were looking for."),
 		err,
 	}

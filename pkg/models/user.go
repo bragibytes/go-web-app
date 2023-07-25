@@ -33,10 +33,10 @@ func new_stats() *stats {
 
 type User struct {
 	ID              primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	Name            string             `json:"name" bson:"name,omitempty" validate:"required, gt=3"`
+	Name            string             `json:"name" bson:"name,omitempty" validate:"required,gt=3"`
 	Email           string             `json:"email" bson:"email,omitempty" validate:"required,email"`
-	Password        string             `json:"password,omitempty" bson:"password,omitempty" validate:"required, gt=8"`
-	ConfirmPassword string             `json:"confirmPassword,omitempty" bson:"-" validate:"required,eqfield=Password"`
+	Password        string             `json:"password,omitempty" bson:"password,omitempty" validate:"required,min=8"`
+	ConfirmPassword string             `json:"confirm_password,omitempty" bson:"-" validate:"required,eqfield=Password"`
 	Bio             string             `json:"bio,omitempty" bson:"bio,omitempty"`
 	CreatedAt       time.Time          `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt       time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
@@ -44,23 +44,26 @@ type User struct {
 	Stats *stats `json:"stats,omitempty" bson:"stats,omitempty"`
 }
 
-func (u *User) StringID() string {
-	return u.ID.Hex()
+func (u *User) Validate() []string {
+	validation_errors := make([]string, 0)
+	// encrypt password
+	if err := validate.Struct(u); err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			new_error := fmt.Sprintf("Bad Data!\nField: %s\nError: %s\n\n", err.Field(), err.ActualTag())
+			validation_errors = append(validation_errors, new_error)
+		}
+	}
+	return validation_errors
 }
 
 // Create
 func (u *User) Save() error {
-	validate := validator.New()
-	// encrypt password
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 	u.Password = string(hashedPassword)
-
-	if err := validate.Struct(u); err != nil {
-		return err
-	}
 	// save to database
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()

@@ -15,15 +15,13 @@ type Post struct {
 	Content   string             `json:"content" bson:"content,omitempty" validate:"required" min:"5" max:"10000"`
 	CreatedAt time.Time          `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
-	Errors    []string
-
-	Score int32 `json:"score" bson:"-"`
+	Errors    []string           `bson:"-"`
+	Score     int32              `json:"score" bson:"-"`
 }
 
 // crud
 func (p *Post) Save() error {
-	validate := validator.New()
-	err := validate.Struct(p)
+	err := validator.New().Struct(p)
 	if err != nil {
 		return err
 	}
@@ -36,11 +34,11 @@ func (p *Post) Save() error {
 }
 func GetAllPosts() ([]*Post, error) {
 	var posts []*Post
-	cursor, err := posts_collection.Find(ctx, bson.M{})
+	cur, err := posts_collection.Find(ctx, bson.M{})
 	if err != nil {
 		return posts, err
 	}
-	err = cursor.All(ctx, &posts)
+	err = cur.All(ctx, &posts)
 	if err != nil {
 		return posts, err
 	}
@@ -58,11 +56,18 @@ func GetOnePost(id primitive.ObjectID) (*Post, error) {
 }
 
 func (p *Post) Update(x *Post) error {
-	err := posts_collection.FindOneAndUpdate(ctx, bson.M{"_id": p.ID}, bson.M{"$set": x}).Decode(&p)
+	filter := bson.M{
+		"_id": p.ID,
+	}
+	update := bson.M{
+		"$set": x,
+	}
+	err := posts_collection.FindOneAndUpdate(ctx, filter, update).Decode(&p)
 	return err
 }
 func (p *Post) Delete() error {
-	_, err := posts_collection.DeleteOne(ctx, bson.M{"_id": p.ID})
+	filter := bson.M{"_id": p.ID}
+	_, err := posts_collection.DeleteOne(ctx, filter)
 	return err
 }
 
@@ -85,6 +90,9 @@ func (p *Post) Comments() []*Comment {
 		p.Errors = append(p.Errors, err.Error())
 	}
 	if comments != nil {
+		for _, comment := range comments {
+			calculate_score(comment)
+		}
 		sort_comments(comments)
 		return comments
 	} else {

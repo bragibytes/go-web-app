@@ -1,9 +1,7 @@
 {{template "base" .}}
 
 {{define "content"}}
-    <input type="hidden" id="hidden-package" value="{{.X}}">
-
-    <h2>This is the profile page</h2>
+<div class="row profile-page">
     <div class="container">
         <div class="row">
             <h1>{{.U.Name}}</h1>
@@ -12,13 +10,15 @@
         <div class="row">
             <p>{{.U.Bio}}</p>
         </div>
-    </div>
-
-        {{if .IsAuthenticated}}
-            {{if eq .UserID .U.ID}}
-                <button id="update-button">Update</button>
-                <button id="delete-button">Delete</button>
+        {{if .Client.Authenticated}}
+            {{if eq .Client.ID .U.ID}}
+                <div class="row">
+                    <button class="btn waves-effect" id="update-button">Update</button>
+                    <button class="btn waves-effect" id="delete-button">Delete</button>
+                </div>
             {{end}}
         {{end}}
-
+    </div>
+    </div>
+</div>
 {{end}}

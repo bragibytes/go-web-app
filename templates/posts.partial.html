@@ -1,41 +1,44 @@
 {{define "post"}}
-    <div class="container">
-        <h4 class="row">{{.Title}}</h4>
-        <p class="row">{{.Content}}</p>
-        <div class="row">
-            <h5>Comments : {{len .Comments}}</h5>
-            <h5>Score : {{.Score}}</h5>
-        </div>
-        <div class="vote-box row">
-            <button is-upvote="true" parent="{{.ID}}" >Upvote</button>
-            <button is-upvote="false" parent="{{.ID}}" >Downvote</button>
-        </div>
+{{$logged_in:= .GetClient.Authenticated}}
+<div class="post">
+    <a href="/post/{{.ID.Hex}}"><h4 class="row">{{.Title}}</h4></a>
+    <p class="row forum-content">{{.Content}}</p>
+    <div class="row">
+        <h5>Comments : {{len .Comments}}</h5>
+        <h5>Score : {{.Score}}</h5>
     </div>
+    <a href="/profile/{{.AuthorID.Hex}}"><h6>By : {{.AuthorName}}</h6></a>
+    {{if $logged_in}}
+    <div class="vote-box row">
+        <button class="vote-button" upvote="true" parent="{{.ID.Hex}}" >Upvote</button>
+        <button class="vote-button" upvote="false" parent="{{.ID.Hex}}" >Downvote</button>
+    </div>
+    {{end}}
+</div>
 {{end}}
 
 {{define "post-list"}}
-    <ul class="container">
-        {{if .}}
-            {{range .}}
-                <li class="row">{{template "post" .}}</li>
-            {{end}}
-        {{else}}
-            <li class="row">No posts</li>
+<ul class="collection post-list">
+    {{if .}}
+        {{range .}}
+            <li class="collection-item z-depth-3">{{template "post" .}}</li>
         {{end}}
-    </ul>
+    {{else}}
+        <li class="collection-item">No posts</li>
+    {{end}}
+</ul>
 {{end}}
 
 {{ define "post-creator"}}
-    <form id="post-creator">
-        <div class="form-group">
-            <label for="title">Title</label>
-            <input name="title" type="text" class="form-control" id="title" placeholder="Title">
-        </div>
-        <div class="form-group">
-            <label for="content">Content</label>
-            <textarea name="content" class="form-control" id="content" rows="3"></textarea>
-        </div>
-        <input type="hidden" name="author" value="{{.Hex}}">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+<form id="post-creator">
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input name="title" type="text" class="form-control" id="title" placeholder="Title">
+    </div>
+    <div class="form-group">
+        <label for="content">Content</label>
+        <textarea name="content" class="form-control" id="content" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
 {{end}}

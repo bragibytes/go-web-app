@@ -1,0 +1,43 @@
+
+
+
+{{define "navbar"}}
+<nav class="row teal darken-1 nav-wrapper">
+    
+    <a href="/" class="brand-logo left">ThoughtSea</a>
+    <ul id="nav-mobile" class="right">
+        <li><a href="/board">Board</a></li>
+        <li><a href="/about">About</a></li>
+        {{if .Authenticated}}
+        <li><a class="dropdown-trigger" href="#!" data-target="dropdown1"><i class="material-icons green-lighten-1 pulse">sentiment_very_satisfied</i></a></li>
+        {{else}}
+        <li><a class="dropdown-trigger" href="#!" data-target="dropdown2"><i class="material-icons gray-darken-2">sentiment_neutral</i></a></li>
+        {{end}}
+    </ul>
+  </nav>
+  <!-- Dropdown Structure -->
+<ul id="dropdown1" class="dropdown-content">
+    <li class="center-align"><span>{{.Name}}</span></li>
+    <li><a href="/profile">Profile</a></li>
+    <li class="divider"></li>
+    <li id="logout-button"><a>Logout</a></li>
+</ul>
+<ul id="dropdown2" class="dropdown-content">
+    <li id="login-button"><a href="#!">Log In</a></li>
+    <li class="divider"></li>
+    <li id="register-button"><a href="#!">Sign Up</a></li>
+</ul>
+{{end}}
+
+
+{{define "footer"}}
+<footer class="page-footer">
+    <div class="footer-copyright">
+      <div class="container">
+      © 2023 Your Company Name
+      <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+      </div>
+    </div>
+  </footer>
+{{end}}
+

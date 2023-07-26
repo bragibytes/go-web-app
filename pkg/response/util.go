@@ -31,7 +31,7 @@ func ValidationErrors(c *gin.Context, errors []string) {
 		"Validation Errors",
 		errors,
 	}
-	c.JSON(http.StatusBadRequest, res)
+	c.JSON(http.StatusTeapot, res)
 }
 
 func BadReq(c *gin.Context, err error) {

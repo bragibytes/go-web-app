@@ -53,6 +53,7 @@ export const update_user = async (update:user):Promise<server_response> => {
     
     if(successful(response)) {
         swal_success(response)
+        .then(()=>{window.location.reload()})
     }else{
         swal_error(response)
     }
@@ -89,17 +90,10 @@ export const login_user = async (user:user):Promise<server_response> => {
     const response: server_response = await result.json()
     
     if(successful(response)){
-        Swal.fire({
-            icon: swal_type(response),
-            title: response.message,
-            showConfirmButton: false,
-            timer: 2000
-        }).then(() => {window.location.href = "/profile"})   
+        swal_success(response)
+        .then(() => {window.location.href = "/profile"})   
     }else{
-        Swal.fire({
-            icon: swal_type(response),
-            title: response.message
-        })
+        swal_error(response)
     }
 
     return response
@@ -136,12 +130,8 @@ export const register_user = async (user:user):Promise<server_response> => {
     const response = await result.json()
     
     if(successful(response)){
-        Swal.fire({
-            icon:swal_type(response),
-            title:response.message,
-            showConfirmButton:false,
-            timer:success_timeout
-        }).then(() => {window.location.href = "/profile" })
+        swal_success(response)
+        .then(() => {window.location.href = "/profile" })
     }else if(teapot(result)){
         Swal.fire({
             icon:response.message_type,
@@ -149,17 +139,13 @@ export const register_user = async (user:user):Promise<server_response> => {
             html:response.data.join("\n")
         })
     }else {
-        Swal.fire({
-            icon:response.message_type,
-            title:response.message,
-            html:response.data,
-        })
+        swal_error(response)
     }
 
     return response
 }
 // posts
-export const create_post = async (post:post, author:string):Promise<server_response> => {
+export const create_post = async (post:post):Promise<server_response> => {
     const opts = {
         method:POST,
             body:JSON.stringify(post),
@@ -167,21 +153,13 @@ export const create_post = async (post:post, author:string):Promise<server_respo
                 "Content-Type":"application/json"
             }
     }
-    const result = await fetch(root+"posts/"+author, opts)
+    const result = await fetch(root+"posts", opts)
     const response:server_response = await result.json()
 
     if(successful(response)){
-        Swal.fire({
-            icon:swal_type(response),
-            title:response.message,
-            showConfirmButton:false,
-            timer:success_timeout
-        }).then(() => {window.location.reload()})
+        swal_success(response).then(() => {window.location.reload()})
     }else{
-        Swal.fire({
-            icon:swal_type(response),
-            title:response.message
-        })
+        swal_error(response)
     }
 
     return response
@@ -194,18 +172,11 @@ export const delete_post = async (id:string):Promise<server_response> => {
     const response:server_response = await result.json()
 
     if(successful(response)){
-        Swal.fire({
-            icon:swal_type(response),
-            title:response.message,
-            showConfirmButton:false,
-            timer:success_timeout
-        }).then(() => {window.location.reload()})
+        swal_success(response)
+        .then(() => {window.location.replace("/board")})   
         
     }else{
-        Swal.fire({
-            icon:swal_type(response),
-            title:response.message
-        })
+        swal_error(response)
     }
 
     return response
@@ -222,7 +193,8 @@ export const update_post = async (id:string, data:post):Promise<server_response>
     const response:server_response = await result.json()
 
     if(successful(response)){
-        swal_success(response).then(() => {window.location.reload()})
+        swal_success(response)
+        .then(() => {window.location.reload()})
     }else{
         swal_error(response)
     }
@@ -230,7 +202,7 @@ export const update_post = async (id:string, data:post):Promise<server_response>
     return response
 }
 // comments
-export const create_comment = async (id:string, data:comment):Promise<server_response> => {
+export const create_comment = async (data:comment):Promise<server_response> => {
     const opts = {
         method:POST,
         body:JSON.stringify(data),
@@ -238,7 +210,7 @@ export const create_comment = async (id:string, data:comment):Promise<server_res
             "Content-Type":"application/json"
         }
     }
-    const result = await fetch(root+"comments/"+id, opts)
+    const result = await fetch(root+"comments", opts)
     const response:server_response = await result.json()
 
     if(successful(response)){
@@ -262,7 +234,7 @@ export const send_vote = async (vote:vote, parent:string):Promise<server_respons
     const result = await fetch(root+"votes/"+parent, opts)
     const response:server_response = await result.json()
     
-    !successful(response) && swal_error(response)
+    !successful(response) ? swal_error(response):window.location.reload()
 
     return response
 }

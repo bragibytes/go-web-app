@@ -1,46 +1,15 @@
 {{define "user"}}
-    <div class="user">
-        <h2>{{.Name}}</h2>
-    </div>
+<li class="user z-depth-3">
+    <a href="/profile/{{.ID.Hex}}"><h3 class="white-text">{{.Name}}</h3></a>
+    <p>{{.Bio}}</p>
+</li>
 {{end}}
 
 {{define "user-list"}}
-
-    <ul>
-        {{range .}}
-            <a href="/profile/{{.ID.Hex}}"><li>{{template "user" .}}</li></a>
-        {{end}}
-    </ul>
-{{end}}
-
-
-{{define "login-form"}}
-
-    {{if not .}}
-    <form id="login-form" class="container">
-        <div class="row">
-            <input type="text" placeholder="username" name="username"/>
-            <input type="password" placeholder="password" name="password"/>
-            <input class="button button-primary" type="submit" value="Login!"/>
-        </div>
-    </form>
+<ul class="user-list collection">
+    {{range .}}
+    {{template "user" .}}
     {{end}}
-
+</ul>
 {{end}}
 
-{{define "register-form"}}
-
-
-    {{if not .}}
-    <form id="register-form" class="container">
-        <div class="row">
-            <input type="text" placeholder="username" name="username"/>
-            <input type="email" placeholder="email" name="email"/>
-            <input type="password" placeholder="password" name="password"/>
-            <input type="password" placeholder="confirm password" name="confirm-password"/>
-            <input class="button button-primary" type="submit" value="Register!"/>
-        </div>
-    </form>
-    {{end}}
-
-{{end}}

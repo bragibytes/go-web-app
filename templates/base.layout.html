@@ -5,16 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" href="/static/styles/index.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/notie/dist/notie.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles/index.css"/>
     {{block "style" .}}{{end}}
 </head>
 <body>
-    {{template "header" .}}
-    {{block "content" .}}{{end}}
-    <script src="/static/scripts/dist/bundle.js"></script>
+    <div class="main container full-width">
+        {{template "navbar" .Client}}
+        {{block "content" .}}{{end}}
+        {{template "footer" .Client}}
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://unpkg.com/notie"></script>
+    <script src="/static/scripts/dist/bundle.js"></script>
     {{block "scripts" .}}{{end}}
 </body>
 </html>
+{{end}}
+{{define "chemical"}}
+<input type="hidden" id="json-data" value="{{.}}">
 {{end}}

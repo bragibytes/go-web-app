@@ -1,0 +1,36 @@
+{{template "base" .}}
+
+{{define "content"}}
+    {{$mine:= eq .Client.ID .P.AuthorID}}
+    {{$logged_in:= .Client.Authenticated}}
+
+    {{template "chemical" .X}}
+
+    <div class="row post-page">
+        <div class="row">
+            <h1>{{.P.Title}}</h1>
+        </div>
+        <div class="row">
+            <p>{{.P.Content}}</p>
+        </div>
+        <div class="row">
+            <p>By : {{.P.AuthorName}}</p>
+        </div>
+        <div class="row footer">
+            {{if and $logged_in $mine}}
+                <button class="btn" id="post-updater">Update</button>
+                <button class="btn" id="post-deleter">Delete</button>
+            {{end}}
+            {{if $logged_in}}
+                <div class="vote-box">
+                    <button class="vote-button btn" upvote="true" parent="{{.P.ID.Hex}}">Like</button>
+                    <button class="vote-button btn" upvote="false" parent="{{.P.ID.Hex}}" >Dislike</button>
+                </div>
+            {{end}}
+        </div>
+    </div>
+    {{template "comment-list" .P.Comments }}
+    {{if and $logged_in $mine}}
+        <button id="comment-creator">Comment</button>  
+    {{end}}
+{{end}}

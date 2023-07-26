@@ -5,7 +5,7 @@ const update_button_element = document.getElementById(update_button) as HTMLButt
 const delete_button_element = document.getElementById(delete_button) as HTMLButtonElement
 
 import Swal from "sweetalert2"
-import {update_user, delete_user, logout_user} from "../api";
+import {update_user, delete_user} from "../api";
 import {user} from "../interfaces"
 import { element_exists } from "./config";
 

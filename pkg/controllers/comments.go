@@ -9,12 +9,6 @@ import (
 
 type comment_controller struct{}
 
-func new_comment_controller() *comment_controller {
-	x := &comment_controller{}
-
-	return x
-}
-
 func (cc *comment_controller) use(r *gin.RouterGroup) {
 	r.POST("/", cc.create)
 	r.GET("/", cc.get_all)
@@ -24,7 +18,7 @@ func (cc *comment_controller) use(r *gin.RouterGroup) {
 }
 func (cc *comment_controller) create(c *gin.Context) {
 	var comment *models.Comment
-	if err := c.ShouldBindJSON(&cc); err != nil {
+	if err := c.ShouldBindJSON(&comment); err != nil {
 		response.BadReq(c, err)
 		return
 	}
@@ -54,7 +48,7 @@ func (cc *comment_controller) get_all(c *gin.Context) {
 		return
 	}
 	response.OK(c, "successfully fetched comments", comments)
-	return
+
 }
 func (cc *comment_controller) update(c *gin.Context) {
 	var comment_update *models.Comment

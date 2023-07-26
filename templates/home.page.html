@@ -1,18 +1,15 @@
 {{template "base" .}}
 
-    {{define "content"}}
-        <div class="container">
-            <div class="row">
-                <h1>Home Page!</h1>
-                {{template "user-list" .GetAllUsers}}
-                {{template "login-form" .IsAuthenticated}}
-                {{template "register-form" .IsAuthenticated}}
-                {{if .IsAuthenticated}}
-                    <button id="logout-button">Logout</button>
-                {{end}}
-                <h3>Hi {{.GetIP}} its nice to see you!</h3>
-                <p>you are logged in : {{.IsAuthenticated}}</p>
-            </div>
+{{define "content"}}
+<div class="row home-page">
+    <div class="col m2">
+         {{template "user-list" .Get.Users}}
+    </div>
+    <div class="col m10 splash">
+        <div>
+            <h1>ThoughtSea</h1>
+            <h6>What's on your mind?</h6>
         </div>
-
-    {{end}}
+    </div>
+ </div>
+{{end}}

@@ -17,6 +17,7 @@ var users_collection *mongo.Collection
 var posts_collection *mongo.Collection
 var comments_collection *mongo.Collection
 var votes_collection *mongo.Collection
+var Reader *TemplateReader
 
 func Init(c *mongo.Client) {
 	users_collection = c.Database(DatabaseName).Collection("users")
@@ -24,6 +25,7 @@ func Init(c *mongo.Client) {
 	comments_collection = c.Database(DatabaseName).Collection("comments")
 	votes_collection = c.Database(DatabaseName).Collection("votes")
 	validate = validator.New()
+	Reader = &TemplateReader{make([]string, 0)}
 }
 
 type voteable interface {
@@ -61,4 +63,35 @@ func calculate_score(v voteable) error {
 		}
 	}
 	return nil
+}
+
+type TemplateReader struct {
+	Errors []string
+}
+
+func (g *TemplateReader) Posts() []*Post {
+	var posts []*Post
+	cur, err := posts_collection.Find(ctx, bson.M{})
+	if err != nil {
+		g.Errors = append(g.Errors, err.Error())
+	}
+	if err := cur.All(ctx, &posts); err != nil {
+		g.Errors = append(g.Errors, err.Error())
+	}
+	for _, post := range posts {
+		calculate_score(post)
+	}
+	sort_posts(posts)
+	return posts
+}
+func (g *TemplateReader) Users() []*User {
+	var users []*User
+	cur, err := users_collection.Find(ctx, bson.M{})
+	if err != nil {
+		g.Errors = append(g.Errors, err.Error())
+	}
+	if err := cur.All(ctx, &users); err != nil {
+		g.Errors = append(g.Errors, err.Error())
+	}
+	return users
 }

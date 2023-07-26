@@ -1,0 +1,103 @@
+@import "normalize.css";
+// @import "skeleton.css";
+@import "./theme/_variables.scss";
+@font-face {
+    font-family: 'TitleFont';
+    src: url('./fonts/Title/TitleFont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'MainFont';
+    src: url('./fonts/Main/MainFont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'ContentFont';
+    src: url('./fonts/Content/ContentFont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+h1 {
+    font-family:'MainFont';
+}
+.a {
+    color:maroon
+}
+
+.col, .row, .container {
+    // border:$debug-border;
+}
+
+.home-page, .post-page, .about-page, .board-page, .profile-page {
+    max-height:90vh;
+    height:100%;
+}
+.splash {
+    height:90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'TitleFont'
+}
+.main {
+    background-image: url("/static/images/zen-02.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+nav {
+    font-family: 'MainFont';
+    font-size: $base-font-size;
+  .brand-logo {
+    font-family:'TitleFont';
+  }
+}
+.home-page {
+    margin-top:-18px;
+}
+#logout-button {
+    cursor: pointer;
+}
+.post-list {
+    font-family: 'ContentFont';
+}
+.user {
+    padding:$base-padding;
+    margin:$base-margin;
+    font-family:'MainFont';
+}
+.user-list {
+    max-height: 90vh;
+    overflow: auto;
+    scrollbar-width: none;  /* Firefox */
+}
+.col {
+}
+.full-width {
+    width: 100vw;
+    max-width: 100%;
+  }
+.home-page {
+    
+    
+}
+
+.post-list {
+    .collection-item {
+        margin:$base-margin;
+    }
+}
+.post {
+    border:$base-border-thickness groove $secondary-color;
+    padding:$base-padding;
+}
+
+body {
+    background-color:beige;
+}
+.login-button, .register-button {
+    text-align: center;
+    padding:$base-padding;
+}

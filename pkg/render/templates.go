@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/dedpidgon/go-web-app/pkg/controllers"
+	"github.com/dedpidgon/go-web-app/pkg/config"
 	"github.com/dedpidgon/go-web-app/pkg/models"
 	"github.com/dedpidgon/go-web-app/pkg/response"
 	"github.com/gin-gonic/gin"
@@ -22,6 +22,14 @@ func Handle(r *gin.Engine) {
 	r.GET("/profile", profile_page)
 	r.GET("/board", board_page)
 	r.GET("/about", about_page)
+	r.GET("/post/:id", post_page)
+	r.GET("/game", game_page)
+}
+
+func game_page(c *gin.Context) {
+	if err := render_template(c, "game"); err != nil {
+		response.ServerErr(c, err)
+	}
 }
 
 func home_page(c *gin.Context) {
@@ -38,7 +46,7 @@ func profile_page(c *gin.Context) {
 	var err error
 
 	if param == "" {
-		user, err = models.GetOneUser(controllers.UserController.UserID())
+		user, err = models.GetOneUser(config.Client.ID)
 		if err != nil {
 			response.NotFound(c, "user", err.Error())
 			return
@@ -66,7 +74,7 @@ func profile_page(c *gin.Context) {
 }
 
 func board_page(c *gin.Context) {
-	fmt.Println(" ----- rendering board bage with .UserID of", controllers.UserController.UserID())
+	fmt.Println(" ----- rendering board bage with .UserID of", config.Client.ID)
 	if err := render_template(c, "board"); err != nil {
 		response.ServerErr(c, err)
 		return
@@ -88,7 +96,6 @@ func post_page(c *gin.Context) {
 	data.X = post.AsJsonString()
 	if err := render_template(c, "post"); err != nil {
 		response.ServerErr(c, err)
-		return
 	}
 }
 

@@ -1,9 +1,14 @@
 {{template "base" .}}
 
 {{define "content"}}
-
-    <h1>This is the Board Page!!!</h1>
-
-    {{template "post-list" .GetAllPosts}}
-    {{if .IsAuthenticated}} {{template "post-creator" .UserID}} {{end}}
+    <div class="row board-page">
+        <h1>This is the Board Page!!!</h1>
+        <div class="row">
+            {{if .Client.Authenticated}} {{template "post-creator" .Client.ID}} {{end}}
+        </div>
+        <div class="row">
+            {{template "post-list" .Get.Posts}}
+        </div>
+    
+    </div>
 {{end}}

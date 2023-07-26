@@ -1,36 +1,54 @@
-const login_form = "login-form"
-const register_form = "register-form"
+const login_button = "login-button"
+const register_button = "register-button"
 const logout_button = "logout-button"
 
-const login_form_element = document.getElementById(login_form) as HTMLFormElement
+const login_button_element = document.getElementById(login_button) as HTMLFormElement
 const logout_button_element = document.getElementById(logout_button) as HTMLButtonElement
-const register_form_element = document.getElementById(register_form) as HTMLFormElement
+const register_button_element = document.getElementById(register_button) as HTMLFormElement
 
+import Swal from "sweetalert2"
 import {user} from "../interfaces";
 import { login_user, logout_user, register_user } from "../api";
 import { element_exists } from "./config";
 
-const login_form_handler = () => {
+const login_button_handler = () => {
 
-    const username = (): HTMLInputElement => {
-        return login_form_element.querySelector(`[name="username"]`) as HTMLInputElement
-    }
-    const password = (): HTMLInputElement => {
-        return login_form_element.querySelector(`[name="password"]`) as HTMLInputElement
-    }
-    const clear_inputs = () => {
-        username().value = ""
-        password().value = ""
-    }
-    const on_submit = async (e: Event) => {
+    
+    const on_click = async (e: Event) => {
         e.preventDefault()
-        let data: user = {
-            name: username().value,
-            password: password().value
-        }
-        login_user(data) 
+        Swal.fire({
+            title: "Login",
+            html: `
+                <form class="container">
+                    <div class="form-group row">
+                        <input id="username" class="swal2-input" placeholder="Username...">
+                    </div>
+                    <div class="form-group row">
+                        <input type="password" id="password" class="swal2-input" placeholder="Password...">
+                    </div>
+                </form>
+            `,
+            confirmButtonText: "Log In!",
+            showCancelButton: true,
+            allowEnterKey:true,
+            preConfirm: async () => {
+                const username_input = Swal.getPopup()!.querySelector("#username") as HTMLInputElement;
+                const password_input = Swal.getPopup()!.querySelector("#password") as HTMLInputElement;
+
+                // Retrieve user input and handle data
+                const username: string = username_input ? username_input.value:""
+                const password: string = password_input ? password_input.value:""
+                // Do something with the newUsername and newEmail, e.g., send it to the server
+                const user_to_login:user = {
+                    name:username,
+                    password:password,
+                }
+                login_user(user_to_login)
+            },
+        });
+        
     }
-    login_form_element.addEventListener("submit", on_submit)
+    login_button_element.addEventListener("click", on_click)
 }
 
 const logout_button_handler = () => {
@@ -42,40 +60,60 @@ const logout_button_handler = () => {
     logout_button_element.addEventListener("click", on_click)
 }
 
-const register_form_handler = () => {
-    const username = (): HTMLInputElement => {
-        return register_form_element.querySelector(`[name="username"]`) as HTMLInputElement
+const register_button_handler = () => {
+  
+    const on_click = async (e:Event) => {
+        Swal.fire({
+            title: "Create User",
+            html: `
+                <div class="container">
+                    <div class="row">
+                        <input id="username" class="swal2-input" placeholder="Username...">
+                        <input id="email" class="swal2-input" placeholder="Email">
+                        <input type="password" id="password" class="swal2-input" placeholder="Password...">
+                        <input type="password" id="confirm-password" class="swal2-input" placeholder="Password Again...">
+                    </div>
+                </div>
+            `,
+            confirmButtonText: "Sign Up!",
+            showCancelButton: true,
+            preConfirm: async () => {
+                const username_input = Swal.getPopup()!.querySelector("#username") as HTMLInputElement;
+                const email_input = Swal.getPopup()!.querySelector("#email") as HTMLInputElement;
+                const password_input = Swal.getPopup()!.querySelector("#email") as HTMLInputElement;
+                const confirm_password_input = Swal.getPopup()!.querySelector("#email") as HTMLInputElement;
+
+                // Retrieve user input and handle data
+                const username: string = username_input ? username_input.value:""
+                const email: string = email_input ? email_input.value:""
+                const password: string = password_input ? password_input.value:""
+                const confirm_password: string = confirm_password_input ? confirm_password_input.value:""
+                // Do something with the newUsername and newEmail, e.g., send it to the server
+                const new_user:user = {
+                    name:username,
+                    email:email,
+                    password:password,
+                    confirm_password:confirm_password
+                }
+                register_user(new_user)
+            },
+        });
     }
-    const password = (): HTMLInputElement => {
-        return register_form_element.querySelector(`[name="password"]`) as HTMLInputElement
-    }
-    const email = (): HTMLInputElement => {
-        return register_form_element.querySelector(`[name="email"]`) as HTMLInputElement
-    }
-    const confirm_password = (): HTMLInputElement => {
-        return register_form_element.querySelector(`[name="confirm-password"]`) as HTMLInputElement
-    }
-    const on_submit = async (e:Event) => {
-        e.preventDefault()
-        const data: user = {
-            name:username().value,
-            email:email().value,
-            password:password().value,
-            confirm_password:confirm_password().value
-        }
-        register_user(data)
-    }
-    register_form_element.addEventListener("submit", on_submit)
+    register_button_element.addEventListener("click", on_click);
 }
 
 const run = () => {
-    if(element_exists(login_form)) {
-        login_form_handler()
+    console.log("running authentication")
+    if(element_exists(login_button)) {
+        console.log("login form exists")
+        login_button_handler()
     }
-    if(element_exists(register_form)){
-        register_form_handler()
+    if(element_exists(register_button)){
+        console.log("register button exists")
+        register_button_handler()
     }
     if(element_exists(logout_button)){
+        console.log("logout button exists")
         logout_button_handler()
     }
 }

@@ -1,44 +1,92 @@
 {{define "post"}}
 {{$logged_in:= .GetClient.Authenticated}}
-<div class="post">
-    <a href="/post/{{.ID.Hex}}"><h4 class="row">{{.Title}}</h4></a>
-    <p class="row forum-content">{{.Content}}</p>
-    <div class="row">
-        <h5>Comments : {{len .Comments}}</h5>
-        <h5>Score : {{.Score}}</h5>
+{{$my_post := eq .GetClient.ID .ID}}
+<div class="col s12 {{if $my_post}} black green-text {{end}}">
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title">{{.Title}}</span>
+            <p class="truncate">{{.Content}}</p>
+        </div>
+        <div class="card-action center-align">
+            <a href="/post/{{.ID.Hex}}"><span>Read More</span></a>
+            {{if $logged_in}}
+            {{template "voting" .}}
+            {{end}}
+        </div>
     </div>
-    <a href="/profile/{{.AuthorID.Hex}}"><h6>By : {{.AuthorName}}</h6></a>
-    {{if $logged_in}}
-    <div class="vote-box row">
-        <button class="vote-button" upvote="true" parent="{{.ID.Hex}}" >Upvote</button>
-        <button class="vote-button" upvote="false" parent="{{.ID.Hex}}" >Downvote</button>
-    </div>
-    {{end}}
 </div>
 {{end}}
 
 {{define "post-list"}}
-<ul class="collection post-list">
-    {{if .}}
+<div class="container">
+    <div class="row">
         {{range .}}
-            <li class="collection-item z-depth-3">{{template "post" .}}</li>
+        {{template "post" .}}
         {{end}}
-    {{else}}
-        <li class="collection-item">No posts</li>
-    {{end}}
-</ul>
+    </div>
+</div>
 {{end}}
 
 {{ define "post-creator"}}
-<form id="post-creator">
+<div class="container z-depth-2">
+    <form id="post-creator">
+        <div class="row">
+            <div class="input-field col s12">
+                <input name="title" id="post_title" type="text" class="validate">
+                <label for="post_title">Title</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <textarea name="content" id="post_content" class="materialize-textarea"></textarea>
+                <label for="post_content">Content</label>
+            </div>
+        </div>
+        <button class="btn waves-effect waves-light" type="submit">Submit
+            <i class="material-icons right">send</i>
+        </button>
+    </form>
+</div>
+
+
+<!-- <form id="post-creator">
     <div class="form-group">
         <label for="title">Title</label>
-        <input name="title" type="text" class="form-control" id="title" placeholder="Title">
+        <input name="title" type="text" class="form-control black green-text" id="title" placeholder="Title">
     </div>
     <div class="form-group">
         <label for="content">Content</label>
-        <textarea name="content" class="form-control" id="content" rows="3"></textarea>
+        <textarea name="content" class="form-control black green-text" id="content" rows="3"></textarea>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+</form> -->
+{{end}}
+
+{{define "voting"}}
+<div class="row">
+    {{if .UserHasVoted .GetClient.ID}}
+        {{if .IsUpvote .GetClient.ID}}
+        <a href="#" class="right vote btn-floating orange pulse" value="1" parent="{{.ID.Hex}}">
+            <i class="material-icons">arrow_upward</i>
+        </a>
+        <a href="#" class="left vote btn-floating gray darken-2" value="-1" parent="{{.ID.Hex}}">
+            <i class="material-icons">arrow_downward</i>
+        </a>
+        {{else}}
+        <a href="#" class="right vote btn-floating gray darken-2" value="1" parent="{{.ID.Hex}}">
+            <i class="material-icons">arrow_upward</i>
+        </a>
+        <a href="#" class="left vote btn-floating purple lighten-1 pulse" value="-1" parent="{{.ID.Hex}}">
+            <i class="material-icons">arrow_downward</i>
+        </a>
+        {{end}}
+    {{else}}
+    <a href="#" class="right vote btn-floating gray darken-2" value="1" parent="{{.ID.Hex}}">
+        <i class="material-icons">arrow_upward</i>
+    </a>
+    <a href="#" class="left vote btn-floating gray darken-2" value="-1" parent="{{.ID.Hex}}">
+        <i class="material-icons">arrow_downward</i>
+    </a>
+    {{end}}
+</div>
 {{end}}

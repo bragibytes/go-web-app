@@ -1,21 +1,22 @@
 import { vote } from "../interfaces";
-import { send_vote } from "../api";
+import { vote_on_post } from "../api";
 import { element_exists } from "./config";
 
-const vote_button = "vote-button"
+const vote_button = "vote"
 
-const vote_button_elements = document.getElementsByClassName("vote-button")
+const vote_button_elements = document.getElementsByClassName(vote_button)
 
 const run = () => {
    [...vote_button_elements].forEach(button => {
         button.addEventListener("click", () => {
-            const upvote_string = button.getAttribute("upvote") as string;
-            const is_upvote = JSON.parse(upvote_string) as boolean;
-            const parent = button.getAttribute("parent") as string;
+            const valStr = button.getAttribute("value") as string
+            const val = JSON.parse(valStr) as number
+            const parentID = button.getAttribute("parent") as string
             const data:vote = {
-                is_upvote: is_upvote,
+                value:val,
+                _parent:parentID
             }
-            send_vote(data, parent)
+            vote_on_post(data)
         })
     })
    

@@ -4,7 +4,7 @@ import {
     update_post,
     delete_post
  } from "../api";
-import { post } from "../interfaces";
+import { post, server_response } from "../interfaces";
 import { element_exists, json_data } from "./config";
 
 
@@ -27,6 +27,10 @@ const post_creator_handler = () => {
     const content = () => {
         return post_creator_element.querySelector('[name="content"]') as HTMLInputElement;
     }
+    const clear_inputs = () => {
+        title().value = ""
+        content().value = ""
+    }
     const on_submit = async (e:Event) => {
         e.preventDefault();
         const data:post = {
@@ -34,6 +38,11 @@ const post_creator_handler = () => {
             content: content().value,
         }
         create_post(data)
+        .then((res:server_response)=>{
+            if(res.message_type == "success"){
+                clear_inputs()
+            }
+        })
     }
     post_creator_element.addEventListener('submit', on_submit)
 }

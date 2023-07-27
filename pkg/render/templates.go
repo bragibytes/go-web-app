@@ -17,10 +17,9 @@ func Handle(r *gin.Engine) {
 	}
 	data = standard_stuff()
 
-	r.GET("/", home_page)
+	r.GET("/", board_page)
 	r.GET("/profile/:id", profile_page)
 	r.GET("/profile", profile_page)
-	r.GET("/board", board_page)
 	r.GET("/about", about_page)
 	r.GET("/post/:id", post_page)
 	r.GET("/game", game_page)
@@ -32,14 +31,14 @@ func game_page(c *gin.Context) {
 	}
 }
 
-func home_page(c *gin.Context) {
+// func home_page(c *gin.Context) {
 
-	if err := render_template(c, "home"); err != nil {
-		response.ServerErr(c, err)
-		return
-	}
+// 	if err := render_template(c, "home"); err != nil {
+// 		response.ServerErr(c, err)
+// 		return
+// 	}
 
-}
+// }
 func profile_page(c *gin.Context) {
 	param := c.Param("id")
 	var user *models.User

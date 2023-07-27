@@ -6,11 +6,10 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var DatabaseName string = "theThing"
+var DatabaseName string = "thought_sea"
 var ctx = context.TODO()
 var validate *validator.Validate
 var users_collection *mongo.Collection
@@ -28,12 +27,6 @@ func Init(c *mongo.Client) {
 	Reader = &TemplateReader{make([]string, 0)}
 }
 
-type voteable interface {
-	add_to_score()
-	subtract_from_score()
-	get_id() primitive.ObjectID
-}
-
 func sort_comments(comments []*Comment) {
 	sort.Slice(comments, func(i, j int) bool {
 		return comments[i].Score > comments[j].Score
@@ -41,28 +34,8 @@ func sort_comments(comments []*Comment) {
 }
 func sort_posts(posts []*Post) {
 	sort.Slice(posts, func(i, j int) bool {
-		return posts[i].Score > posts[j].Score
+		return posts[i].Score() > posts[j].Score()
 	})
-}
-
-func calculate_score(v voteable) error {
-	filter := bson.M{"_parent": v.get_id()}
-	var votes []*Vote
-	cur, err := votes_collection.Find(ctx, filter)
-	if err != nil {
-		return err
-	}
-	if err := cur.All(ctx, &votes); err != nil {
-		return err
-	}
-	for _, vote := range votes {
-		if vote.IsUpvote {
-			v.add_to_score()
-		} else {
-			v.subtract_from_score()
-		}
-	}
-	return nil
 }
 
 type TemplateReader struct {
@@ -77,9 +50,6 @@ func (g *TemplateReader) Posts() []*Post {
 	}
 	if err := cur.All(ctx, &posts); err != nil {
 		g.Errors = append(g.Errors, err.Error())
-	}
-	for _, post := range posts {
-		calculate_score(post)
 	}
 	sort_posts(posts)
 	return posts

@@ -1,55 +1,23 @@
 @import "normalize.css";
-@font-face {
-  font-family: "TitleFont";
-  src: url("./fonts/Title/TitleFont.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: "MainFont";
-  src: url("./fonts/Main/MainFont.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: "ContentFont";
-  src: url("./fonts/Content/ContentFont.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-h1 {
-  font-family: "MainFont";
-}
-
-.a {
-  color: maroon;
-}
-
 .home-page, .post-page, .about-page, .board-page, .profile-page {
   max-height: 90vh;
   height: 100%;
+  overflow: auto;
+  scrollbar-width: 0;
 }
 
-.splash {
-  height: 90vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "TitleFont";
+.tenor {
+  font-family: "Tenor Sans", sans-serif;
+}
+
+.gloria {
+  font-family: "Gloria Hallelujah", cursive;
 }
 
 .main {
   background-image: url("/static/images/zen-02.jpg");
   background-size: cover;
   background-attachment: fixed;
-}
-
-nav {
-  font-family: "MainFont";
-  font-size: 5rem;
-}
-nav .brand-logo {
-  font-family: "TitleFont";
 }
 
 .home-page {
@@ -60,14 +28,8 @@ nav .brand-logo {
   cursor: pointer;
 }
 
-.post-list {
-  font-family: "ContentFont";
-}
-
-.user {
-  padding: 0.75rem;
-  margin: 0.75rem;
-  font-family: "MainFont";
+.user:hover {
+  box-shadow: inset 0 0 10px yellow;
 }
 
 .user-list {
@@ -81,22 +43,31 @@ nav .brand-logo {
   max-width: 100%;
 }
 
-.post-list .collection-item {
-  margin: 0.75rem;
+.login-button, .register-button {
+  text-align: center;
 }
 
 .post {
-  border: 1px groove darkred;
-  padding: 0.75rem;
+  border: 2px groove rgb(59, 45, 45);
+}
+.post div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
-body {
+p {
+  word-wrap: break-word;
+}
+
+.row.equal-height {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.forum-content {
+  font-size: 2rem;
   background-color: beige;
-}
-
-.login-button, .register-button {
-  text-align: center;
-  padding: 0.75rem;
 }
 
 /*# sourceMappingURL=index.css.map */

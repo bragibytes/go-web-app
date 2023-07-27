@@ -1,6 +1,6 @@
 {{define "user"}}
-<li class="user z-depth-3">
-    <a href="/profile/{{.ID.Hex}}"><h3 class="white-text">{{.Name}}</h3></a>
+<li class="collection-item user z-depth-2">
+    <a href="/profile/{{.ID.Hex}}" class="center-align"><h3>{{.Name}}</h3></a>
     <p>{{.Bio}}</p>
 </li>
 {{end}}

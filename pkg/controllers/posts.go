@@ -18,6 +18,7 @@ func (pc *post_controller) use(r *gin.RouterGroup) {
 	r.GET("/:id", pc.get_one)
 	r.PUT("/:id", pc.update)
 	r.DELETE("/:id", pc.delete)
+	r.POST("/vote", pc.vote)
 }
 func (pc *post_controller) create(c *gin.Context) {
 	var post *models.Post
@@ -109,4 +110,20 @@ func (pc *post_controller) delete(c *gin.Context) {
 		return
 	}
 	response.OK(c, "successfully deleted post", nil)
+}
+
+func (p *post_controller) vote(c *gin.Context) {
+	var vote *models.Vote
+	if err := c.ShouldBindJSON(&vote); err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	vote.Author = config.Client.ID
+	post := &models.Post{ID: vote.Parent}
+	if err := post.Vote(vote); err != nil {
+		response.ServerErr(c, err)
+		return
+	}
+
+	response.OK(c, "thanks for voting", nil)
 }

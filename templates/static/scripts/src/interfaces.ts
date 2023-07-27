@@ -28,7 +28,7 @@ export interface vote {
     _id?:string
     _author?:string
     _parent?:string
-    is_upvote?:boolean
+    value?:number
     created_at?:Date
     updated_at?:Date
 }

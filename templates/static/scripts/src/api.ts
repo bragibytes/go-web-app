@@ -157,7 +157,10 @@ export const create_post = async (post:post):Promise<server_response> => {
     const response:server_response = await result.json()
 
     if(successful(response)){
-        swal_success(response).then(() => {window.location.reload()})
+        swal_success(response)
+        .then(() => {
+            window.location.reload()
+        })
     }else{
         swal_error(response)
     }
@@ -223,7 +226,7 @@ export const create_comment = async (data:comment):Promise<server_response> => {
     return response
 }
 // votes
-export const send_vote = async (vote:vote, parent:string):Promise<server_response> => {
+export const vote_on_post = async (vote:vote):Promise<server_response> => {
     const opts = {
         method:POST,
             body:JSON.stringify(vote),
@@ -231,7 +234,7 @@ export const send_vote = async (vote:vote, parent:string):Promise<server_respons
                 "Content-Type":"application/json"
             }
     }
-    const result = await fetch(root+"votes/"+parent, opts)
+    const result = await fetch(root+"posts/vote", opts)
     const response:server_response = await result.json()
     
     !successful(response) ? swal_error(response):window.location.reload()

@@ -20,8 +20,7 @@ type Post struct {
 	Content    string             `json:"content" bson:"content,omitempty" validate:"required" min:"5" max:"10000"`
 	CreatedAt  time.Time          `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt  time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
-	Errors     []string           `bson:"-" json:"-"`
-	Score      int32              `json:"score" bson:"-"`
+	Votes      []*Vote            `json:"-" bson:"votes"`
 }
 
 func (p *Post) UpdateFriend(f *Post) {
@@ -34,16 +33,30 @@ func (p *Post) UpdateFriend(f *Post) {
 
 }
 
+func (p *Post) exists() bool {
+	filter := bson.M{
+		"title":   p.Title,
+		"content": p.Content,
+	}
+	if err := posts_collection.FindOne(ctx, filter).Decode(&p); err != nil {
+		return false
+	}
+	return true
+}
+
 func (p *Post) Valid() []string {
 	validation_errors := make([]string, 0)
 	validate := validator.New()
+	if p.exists() {
+		validation_errors = append(validation_errors, "That post already exists")
+	}
 	err := validate.Struct(p)
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
 			validation_errors = append(validation_errors, err.Error())
 		}
 	}
-	return nil
+	return validation_errors
 }
 
 // crud
@@ -53,6 +66,7 @@ func (p *Post) Save() error {
 	p.AuthorID = config.Client.ID
 
 	p.HasAuthor = true
+	p.Votes = make([]*Vote, 0)
 	res, err := posts_collection.InsertOne(ctx, p)
 	if err != nil {
 		return err
@@ -70,16 +84,20 @@ func GetAllPosts() ([]*Post, error) {
 	if err != nil {
 		return posts, err
 	}
-	for _, post := range posts {
-		calculate_score(post)
-	}
+
 	sort_posts(posts)
 	return posts, nil
+}
+func (p *Post) Score() int32 {
+	x := 0
+	for _, vote := range p.Votes {
+		x += int(vote.Value)
+	}
+	return int32(x)
 }
 func GetOnePost(id primitive.ObjectID) (*Post, error) {
 	var post *Post
 	err := posts_collection.FindOne(ctx, bson.M{"_id": id}).Decode(&post)
-	calculate_score(post)
 	return post, err
 }
 
@@ -119,6 +137,45 @@ func (p *Post) Delete() error {
 
 }
 
+func (p *Post) Vote(v *Vote) error {
+	if err := posts_collection.FindOne(ctx, bson.M{"_id": p.ID}).Decode(&p); err != nil {
+		return err
+	}
+	// check if vote exists in your array
+	for i, vote := range p.Votes {
+		if vote.Author == v.Author {
+			// user has already voted, changing value
+			if vote.Value == v.Value {
+				// user has erased their vote, remove from array
+				x := p.Votes
+				x[i] = x[len(x)-1]
+				p.Votes = x[:len(x)-1]
+			} else {
+				vote.Value *= -1
+			}
+			return p.update_votes()
+		}
+	}
+	// user is making a new vote
+	v.CreatedAt = time.Now().UTC()
+	v.UpdatedAt = time.Now().UTC()
+	v.ID = primitive.NewObjectID()
+	p.Votes = append(p.Votes, v)
+
+	return p.update_votes()
+}
+
+func (p *Post) update_votes() error {
+	update := bson.M{
+		"$set": bson.M{
+			"votes":      p.Votes,
+			"updated_at": time.Now().UTC(),
+		},
+	}
+	_, err := posts_collection.UpdateByID(ctx, p.ID, update)
+	return err
+}
+
 func (p *Post) GetClient() *config.ClientData {
 	return config.Client
 }
@@ -134,17 +191,9 @@ func (p *Post) AsJsonString() string {
 // template data
 func (p *Post) Comments() []*Comment {
 	var comments []*Comment
-	cur, err := comments_collection.Find(ctx, bson.M{"_parent": p.ID})
-	if err != nil {
-		p.Errors = append(p.Errors, err.Error())
-	}
-	if err = cur.All(ctx, &comments); err != nil {
-		p.Errors = append(p.Errors, err.Error())
-	}
+	cur, _ := comments_collection.Find(ctx, bson.M{"_parent": p.ID})
+	cur.All(ctx, &comments)
 	if comments != nil {
-		for _, comment := range comments {
-			calculate_score(comment)
-		}
 		sort_comments(comments)
 		return comments
 	} else {
@@ -152,6 +201,20 @@ func (p *Post) Comments() []*Comment {
 	}
 }
 
-func (p *Post) add_to_score()              { p.Score += 1 }
-func (p *Post) subtract_from_score()       { p.Score -= 1 }
-func (p *Post) get_id() primitive.ObjectID { return p.ID }
+func (p *Post) UserHasVoted(id primitive.ObjectID) bool {
+	for _, vote := range p.Votes {
+		if vote.Author == id {
+			return true
+		}
+	}
+	return false
+}
+func (p *Post) IsUpvote(id primitive.ObjectID) bool {
+	for _, vote := range p.Votes {
+		if vote.Author == id {
+			return vote.Value != -1
+		}
+	}
+
+	return false
+}

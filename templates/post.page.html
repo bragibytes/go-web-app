@@ -5,16 +5,15 @@
     {{$logged_in:= .Client.Authenticated}}
 
     {{template "chemical" .X}}
-
     <div class="row post-page">
         <div class="row">
-            <h1>{{.P.Title}}</h1>
+            <h1 class="center-align tenor">{{.P.Title}}</h1>
         </div>
         <div class="row">
-            <p>{{.P.Content}}</p>
+            <p class="tenor center-align forum-content">{{.P.Content}}</p>
         </div>
         <div class="row">
-            <p>By : {{.P.AuthorName}}</p>
+            <p class="author-name gloria">{{.P.AuthorName}}</p>
         </div>
         <div class="row footer">
             {{if and $logged_in $mine}}

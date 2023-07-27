@@ -131,7 +131,7 @@ func (u *User) Update() error {
 		"$set": u,
 	}
 	if u.Exists() {
-		return errors.New("User with that name already exists!")
+		return errors.New("User with that name already exists")
 	}
 	u.UpdatedAt = time.Now().UTC()
 	_, err := users_collection.UpdateOne(ctx, filter, update)

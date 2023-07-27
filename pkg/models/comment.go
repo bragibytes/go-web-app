@@ -10,14 +10,15 @@ import (
 type Comment struct {
 	ID         primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 	AuthorID   primitive.ObjectID `json:"_author" bson:"_author"`
-	AuthorName string             `json:"author" bson:"author`
+	AuthorName string             `json:"author" bson:"author"`
 	HasAuthor  bool               `json:"has_author" bson:"has_author"`
 	Parent     primitive.ObjectID `json:"_parent" bson:"_parent"`
 	HasParent  bool               `json:"has_parent" bson:"has_parent"`
 	Content    string             `json:"content" bson:"content"`
 	CreatedAt  time.Time          `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt  time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
-	Score      int32              `json:"score" bson:"score,omitempty"`
+	Score      int32              `json:"score" bson:"-"`
+	Votes      []Vote             `json:"_" bson:"votes"`
 }
 
 // crud
@@ -44,14 +45,14 @@ func GetAllComments() ([]*Comment, error) {
 		return comments, err
 	}
 	for _, comment := range comments {
-		calculate_score(comment)
+		comment.calculate_score()
 	}
 	return comments, nil
 }
 func GetOneComment(id primitive.ObjectID) (*Comment, error) {
 	var comment *Comment
 	err := comments_collection.FindOne(ctx, bson.M{"_id": id}).Decode(&comment)
-	calculate_score(comment)
+	comment.calculate_score()
 	return comment, err
 }
 
@@ -69,7 +70,8 @@ func (c *Comment) Delete() error {
 	return err
 }
 
-// voteable interface
-func (c *Comment) add_to_score()              { c.Score += 1 }
-func (c *Comment) subtract_from_score()       { c.Score -= 1 }
-func (c *Comment) get_id() primitive.ObjectID { return c.ID }
+func (c *Comment) calculate_score() {
+	for _, vote := range c.Votes {
+		c.Score += int32(vote.Value)
+	}
+}

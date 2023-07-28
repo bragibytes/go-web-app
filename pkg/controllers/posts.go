@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/dedpidgon/go-web-app/pkg/config"
 	"github.com/dedpidgon/go-web-app/pkg/models"
 	"github.com/dedpidgon/go-web-app/pkg/response"
@@ -34,7 +36,7 @@ func (pc *post_controller) create(c *gin.Context) {
 		response.ServerErr(c, err)
 		return
 	}
-	response.Created(c, "post", post)
+	response.Created(c, post.OK, post)
 }
 func (pc *post_controller) get_one(c *gin.Context) {
 	oid, err := primitive.ObjectIDFromHex(c.Param("id"))
@@ -92,7 +94,7 @@ func (pc *post_controller) update(c *gin.Context) {
 		response.ServerErr(c, err)
 		return
 	}
-	response.OK(c, "successfully updated post", post)
+	response.OK(c, post.OK, post)
 }
 func (pc *post_controller) delete(c *gin.Context) {
 	if !config.Client.Authenticated {
@@ -104,12 +106,16 @@ func (pc *post_controller) delete(c *gin.Context) {
 		response.BadReq(c, err)
 		return
 	}
-	postToDelete := &models.Post{ID: oid}
-	if err := postToDelete.Delete(); err != nil {
+	post, err := models.Post{ID: oid}.Populate()
+	if err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	if err := post.Delete(); err != nil {
 		response.ServerErr(c, err)
 		return
 	}
-	response.OK(c, "successfully deleted post", nil)
+	response.OK(c, post.OK, nil)
 }
 
 func (p *post_controller) vote(c *gin.Context) {
@@ -125,5 +131,6 @@ func (p *post_controller) vote(c *gin.Context) {
 		return
 	}
 
-	response.OK(c, "thanks for voting", nil)
+	fmt.Println("Vote success and it was a ", post.OK)
+	response.OK(c, post.OK, nil)
 }

@@ -38,7 +38,7 @@ type User struct {
 	Name            string             `json:"name" bson:"name,omitempty" validate:"required,gte=3"`
 	Email           string             `json:"email" bson:"email,omitempty" validate:"required,email"`
 	Password        string             `json:"password,omitempty" bson:"password,omitempty" validate:"required,min=8"`
-	ConfirmPassword string             `json:"confirm_password,omitempty" bson:"-"`
+	ConfirmPassword string             `json:"confirm_password,omitempty" bson:"-" validate:"required,eqfield=Password"`
 	Bio             string             `json:"bio,omitempty" bson:"bio,omitempty"`
 	CreatedAt       time.Time          `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt       time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
@@ -69,7 +69,9 @@ func (u *User) name_is_restricted() bool {
 }
 func (u *User) Valid() []string {
 	validation_errors := make([]string, 0)
-	// encrypt password
+	if u.ID == primitive.NilObjectID && u.Password != u.ConfirmPassword {
+		validation_errors = append(validation_errors, "Please confirm your password")
+	}
 	if u.Exists() {
 		validation_errors = append(validation_errors, "User with that name already exists!")
 	}

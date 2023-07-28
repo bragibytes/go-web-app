@@ -13,6 +13,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@types/jquery": "^3.5.16",
     "@types/pixi.js": "^5.0.0",
     "notie": "^4.3.1",
     "pixi.js": "^7.2.4",

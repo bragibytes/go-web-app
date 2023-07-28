@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"fmt"
+
+	"github.com/dedpidgon/go-web-app/pkg/config"
 	"github.com/dedpidgon/go-web-app/pkg/models"
 	"github.com/dedpidgon/go-web-app/pkg/response"
 	"github.com/gin-gonic/gin"
@@ -15,6 +18,7 @@ func (cc *comment_controller) use(r *gin.RouterGroup) {
 	r.GET("/{id}", cc.get_one)
 	r.PUT("/{id}", cc.update)
 	r.DELETE("/{id}", cc.delete)
+	r.POST("/vote", cc.vote)
 }
 func (cc *comment_controller) create(c *gin.Context) {
 	var comment *models.Comment
@@ -76,4 +80,21 @@ func (cc *comment_controller) delete(c *gin.Context) {
 		return
 	}
 	response.OK(c, "successfully deleted comment", nil)
+}
+
+func (cc *comment_controller) vote(c *gin.Context) {
+	var vote *models.Vote
+	if err := c.ShouldBindJSON(&vote); err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	vote.Author = config.Client.ID
+	comment := &models.Comment{ID: vote.Parent}
+	if err := comment.Vote(vote); err != nil {
+		response.ServerErr(c, err)
+		return
+	}
+
+	fmt.Println("Vote success and it was a ", comment.OK)
+	response.OK(c, comment.OK, nil)
 }

@@ -66,10 +66,10 @@ func OK(c *gin.Context, msg string, data interface{}) {
 	}
 	c.JSON(http.StatusOK, res)
 }
-func Created(c *gin.Context, t string, data interface{}) {
+func Created(c *gin.Context, m string, data interface{}) {
 	res := &response{
 		success,
-		capitalize(t) + " Created!",
+		capitalize(m),
 		data,
 	}
 	c.JSON(http.StatusCreated, res)

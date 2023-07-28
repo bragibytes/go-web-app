@@ -20,7 +20,7 @@ const post_deleter_element = document.getElementById(post_deleter) as HTMLButton
 
 
 const post_creator_handler = () => {
-
+    
     const title = () => {
         return post_creator_element.querySelector('[name="title"]') as HTMLInputElement;
     }
@@ -81,9 +81,10 @@ const post_updater_handler = () => {
     post_updater_element.addEventListener('click', on_click)
 }
 const post_deleter_handler = async () => {
-    const data = json_data() as post;
     const on_click = (e:Event) => {
-        delete_post(data._id!)
+        console.log('CLICK')
+        const data = post_deleter_element.getAttribute('value') as string
+        delete_post(data)
     }
     post_deleter_element.addEventListener('click', on_click)
 }
@@ -94,6 +95,9 @@ const run = () => {
     }
     if(element_exists(post_updater)){
         post_updater_handler()
+    }
+    if(element_exists(post_deleter)){
+        post_deleter_handler()
     }
 }
 

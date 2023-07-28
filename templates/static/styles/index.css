@@ -1,11 +1,4 @@
 @import "normalize.css";
-.home-page, .post-page, .about-page, .board-page, .profile-page {
-  max-height: 90vh;
-  height: 100%;
-  overflow: auto;
-  scrollbar-width: 0;
-}
-
 .tenor {
   font-family: "Tenor Sans", sans-serif;
 }
@@ -14,28 +7,8 @@
   font-family: "Gloria Hallelujah", cursive;
 }
 
-.main {
-  background-image: url("/static/images/zen-02.jpg");
-  background-size: cover;
-  background-attachment: fixed;
-}
-
-.home-page {
-  margin-top: -18px;
-}
-
 #logout-button {
   cursor: pointer;
-}
-
-.user:hover {
-  box-shadow: inset 0 0 10px yellow;
-}
-
-.user-list {
-  max-height: 90vh;
-  overflow: auto;
-  scrollbar-width: none; /* Firefox */
 }
 
 .full-width {
@@ -43,31 +16,20 @@
   max-width: 100%;
 }
 
-.login-button, .register-button {
-  text-align: center;
-}
-
-.post {
-  border: 2px groove rgb(59, 45, 45);
-}
-.post div:nth-child(2) {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-}
-
-p {
-  word-wrap: break-word;
-}
-
 .row.equal-height {
   display: flex;
   flex-wrap: wrap;
 }
 
-.forum-content {
-  font-size: 2rem;
-  background-color: beige;
+.title {
+  padding: 1rem;
+  font-family: "Tenor Sans", sans-serif;
+}
+
+.content {
+  font-size: 1.2rem;
+  font-family: "Tenor Sans", sans-serif;
+  padding: 1rem;
 }
 
 /*# sourceMappingURL=index.css.map */

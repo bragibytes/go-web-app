@@ -4,13 +4,8 @@ import posts from "./controllers/posts";
 import voting from "./controllers/voting";
 import comments from "./controllers/comments";
 
-declare var $: any;
 
-$(document).ready(function() {
-    $(".dropdown-trigger").dropdown();
-});
-
-console.log("handling....")
+console.log("Javascript is working. You look nice today!")
 authentication()
 users()
 posts()

@@ -226,7 +226,7 @@ export const create_comment = async (data:comment):Promise<server_response> => {
     return response
 }
 // votes
-export const vote_on_post = async (vote:vote):Promise<server_response> => {
+export const send_vote = async (vote:vote, t:string):Promise<server_response> => {
     const opts = {
         method:POST,
             body:JSON.stringify(vote),
@@ -234,10 +234,10 @@ export const vote_on_post = async (vote:vote):Promise<server_response> => {
                 "Content-Type":"application/json"
             }
     }
-    const result = await fetch(root+"posts/vote", opts)
+    const result = await fetch(root+t+"/vote", opts)
     const response:server_response = await result.json()
     
-    !successful(response) ? swal_error(response):window.location.reload()
+    !successful(response) && swal_error(response)
 
     return response
 }

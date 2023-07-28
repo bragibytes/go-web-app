@@ -2,9 +2,9 @@ const login_button = "login-button"
 const register_button = "register-button"
 const logout_button = "logout-button"
 
-const login_button_element = document.getElementById(login_button) as HTMLFormElement
-const logout_button_element = document.getElementById(logout_button) as HTMLButtonElement
-const register_button_element = document.getElementById(register_button) as HTMLFormElement
+const login_button_element = document.getElementById(login_button) as HTMLAnchorElement
+const logout_button_element = document.getElementById(logout_button) as HTMLAnchorElement
+const register_button_element = document.getElementById(register_button) as HTMLAnchorElement
 
 import Swal from "sweetalert2"
 import {user} from "../interfaces";
@@ -80,20 +80,15 @@ const register_button_handler = () => {
             preConfirm: async () => {
                 const username_input = Swal.getPopup()!.querySelector("#username") as HTMLInputElement;
                 const email_input = Swal.getPopup()!.querySelector("#email") as HTMLInputElement;
-                const password_input = Swal.getPopup()!.querySelector("#email") as HTMLInputElement;
-                const confirm_password_input = Swal.getPopup()!.querySelector("#email") as HTMLInputElement;
-
-                // Retrieve user input and handle data
-                const username: string = username_input ? username_input.value:""
-                const email: string = email_input ? email_input.value:""
-                const password: string = password_input ? password_input.value:""
-                const confirm_password: string = confirm_password_input ? confirm_password_input.value:""
+                const password_input = Swal.getPopup()!.querySelector("#password") as HTMLInputElement;
+                const confirm_password_input = Swal.getPopup()!.querySelector("#confirm-password") as HTMLInputElement;
+                
                 // Do something with the newUsername and newEmail, e.g., send it to the server
                 const new_user:user = {
-                    name:username,
-                    email:email,
-                    password:password,
-                    confirm_password:confirm_password
+                    name:username_input.value,
+                    email:email_input.value,
+                    password:password_input.value,
+                    confirm_password:confirm_password_input.value
                 }
                 register_user(new_user)
             },
@@ -104,6 +99,7 @@ const register_button_handler = () => {
 
 const run = () => {
     console.log("running authentication")
+   
     if(element_exists(login_button)) {
         console.log("login form exists")
         login_button_handler()

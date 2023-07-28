@@ -16,21 +16,14 @@ func Init() {
 
 func SetClientData() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		remote_ip := c.Request.RemoteAddr
 		ses := sessions.Default(c)
-		ip := ses.Get("remote_ip")
-		if ip == "" {
-			// new visitor
-			ses.Set("remote_ip", remote_ip)
-		}
-		Client.IP = remote_ip
-
 		id := ses.Get("mongo_id")
 		name := ses.Get("username")
-
 		if id == nil && name == nil {
 			// not logged in
 			Client.Authenticated = false
+			Client.Name = "anonymous"
+			Client.ID = primitive.NilObjectID
 		} else {
 			// logged in
 			Client.Authenticated = true

@@ -13,14 +13,15 @@ import (
 
 type Post struct {
 	ID         primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	AuthorID   primitive.ObjectID `json:"_author" bson:"_author,omitempty"`
-	AuthorName string             `json:"author" bson:"author,omitempty"`
+	AuthorID   primitive.ObjectID `json:"_author" bson:"_author"`
+	AuthorName string             `json:"author" bson:"author"`
 	HasAuthor  bool               `json:"has_author" bson:"has_author"`
 	Title      string             `json:"title" bson:"title,omitempty" validate:"required" min:"3" max:"200"`
 	Content    string             `json:"content" bson:"content,omitempty" validate:"required" min:"5" max:"10000"`
-	CreatedAt  time.Time          `json:"created_at" bson:"created_at,omitempty"`
-	UpdatedAt  time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
+	CreatedAt  time.Time          `json:"created_at" bson:"created_at"`
+	UpdatedAt  time.Time          `json:"updated_at" bson:"updated_at"`
 	Votes      []*Vote            `json:"-" bson:"votes"`
+	OK         string             `json:"-" bson:"-"`
 }
 
 func (p *Post) UpdateFriend(f *Post) {
@@ -33,6 +34,10 @@ func (p *Post) UpdateFriend(f *Post) {
 
 }
 
+func (p *Post) DateString() string {
+	return p.CreatedAt.Format("3:04PM January 2 2006")
+}
+
 func (p *Post) exists() bool {
 	filter := bson.M{
 		"title":   p.Title,
@@ -41,6 +46,7 @@ func (p *Post) exists() bool {
 	if err := posts_collection.FindOne(ctx, filter).Decode(&p); err != nil {
 		return false
 	}
+
 	return true
 }
 
@@ -67,10 +73,13 @@ func (p *Post) Save() error {
 
 	p.HasAuthor = true
 	p.Votes = make([]*Vote, 0)
+	p.CreatedAt = time.Now()
+	p.UpdatedAt = time.Now()
 	res, err := posts_collection.InsertOne(ctx, p)
 	if err != nil {
 		return err
 	}
+	p.OK = "im a new post!"
 	p.ID = res.InsertedID.(primitive.ObjectID)
 	return nil
 }
@@ -113,7 +122,11 @@ func (p *Post) Update() error {
 	}
 	p.UpdatedAt = time.Now().UTC()
 	_, err := posts_collection.UpdateOne(ctx, filter, update)
-	return err
+	if err != nil {
+		return err
+	}
+	p.OK = "successfully updated post"
+	return nil
 }
 func (p *Post) Delete() error {
 	if p.AuthorID != config.Client.ID {
@@ -133,8 +146,16 @@ func (p *Post) Delete() error {
 	}}
 	filter = bson.M{"_parent": p.ID}
 	_, err = comments_collection.UpdateMany(ctx, filter, update)
-	return err
+	if err != nil {
+		return err
+	}
+	p.OK = "successfully deleted post"
+	return nil
 
+}
+
+func (p *Post) ModelType() string {
+	return "posts"
 }
 
 func (p *Post) Vote(v *Vote) error {
@@ -145,6 +166,7 @@ func (p *Post) Vote(v *Vote) error {
 	for i, vote := range p.Votes {
 		if vote.Author == v.Author {
 			// user has already voted, changing value
+			p.OK = "update"
 			if vote.Value == v.Value {
 				// user has erased their vote, remove from array
 				x := p.Votes
@@ -161,7 +183,9 @@ func (p *Post) Vote(v *Vote) error {
 	v.UpdatedAt = time.Now().UTC()
 	v.ID = primitive.NewObjectID()
 	p.Votes = append(p.Votes, v)
-
+	if p.OK != "update" {
+		p.OK = "normal"
+	}
 	return p.update_votes()
 }
 
@@ -217,4 +241,9 @@ func (p *Post) IsUpvote(id primitive.ObjectID) bool {
 	}
 
 	return false
+}
+
+func (p Post) Populate() (*Post, error) {
+	err := posts_collection.FindOne(ctx, bson.M{"_id": p.ID}).Decode(&p)
+	return &p, err
 }

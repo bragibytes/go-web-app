@@ -4,11 +4,11 @@
 <div class="row profile-page">
     <div class="container">
         <div class="row">
-            <h1>{{.U.Name}}</h1>
-            <h3>{{.U.Email}}</h3>
+            <h1 class="gloria">{{.U.Name}}</h1>
+            <h3 class="gloria">{{.U.Email}}</h3>
         </div>
         <div class="row">
-            <p>{{.U.Bio}}</p>
+            <p class="tenor">{{.U.Bio}}</p>
         </div>
         {{if .Client.Authenticated}}
             {{if eq .Client.ID .U.ID}}

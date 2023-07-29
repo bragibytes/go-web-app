@@ -15,9 +15,9 @@ type comment_controller struct{}
 func (cc *comment_controller) use(r *gin.RouterGroup) {
 	r.POST("/", cc.create)
 	r.GET("/", cc.get_all)
-	r.GET("/{id}", cc.get_one)
-	r.PUT("/{id}", cc.update)
-	r.DELETE("/{id}", cc.delete)
+	r.GET("/:id", cc.get_one)
+	r.PUT("/:id/:new_content", cc.update)
+	r.DELETE("/:id", cc.delete)
 	r.POST("/vote", cc.vote)
 }
 func (cc *comment_controller) create(c *gin.Context) {
@@ -55,18 +55,20 @@ func (cc *comment_controller) get_all(c *gin.Context) {
 
 }
 func (cc *comment_controller) update(c *gin.Context) {
-	var comment_update *models.Comment
+	fmt.Println("in the update handler")
 	oid, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
 		response.BadReq(c, err)
 		return
 	}
 	comment := &models.Comment{ID: oid}
-	if err := c.ShouldBindJSON(&comment_update); err != nil {
-		response.BadReq(c, err)
+	fmt.Println("going to update comment with new content of ", c.Param("new_content"))
+	comment.Content = c.Param("new_content")
+	if err := comment.Update(); err != nil {
+		response.ServerErr(c, err)
+		return
 	}
-
-	response.OK(c, "successfully updated comment", comment)
+	response.OK(c, comment.OK, comment)
 }
 func (cc *comment_controller) delete(c *gin.Context) {
 	oid, err := primitive.ObjectIDFromHex(c.Param("id"))
@@ -74,12 +76,12 @@ func (cc *comment_controller) delete(c *gin.Context) {
 		response.BadReq(c, err)
 		return
 	}
-	commentToDelete := &models.Comment{ID: oid}
-	if err := commentToDelete.Delete(); err != nil {
+	comment := &models.Comment{ID: oid}
+	if err := comment.Delete(); err != nil {
 		response.ServerErr(c, err)
 		return
 	}
-	response.OK(c, "successfully deleted comment", nil)
+	response.OK(c, comment.OK, nil)
 }
 
 func (cc *comment_controller) vote(c *gin.Context) {

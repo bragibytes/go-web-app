@@ -176,7 +176,7 @@ export const delete_post = async (id:string):Promise<server_response> => {
 
     if(successful(response)){
         swal_success(response)
-        .then(() => {window.location.replace("/board")})   
+        .then(() => {window.location.replace("/")})   
         
     }else{
         swal_error(response)
@@ -223,6 +223,41 @@ export const create_comment = async (data:comment):Promise<server_response> => {
         swal_error(response)
     }
 
+    return response
+}
+export const update_comment = async (id:string, new_content:string):Promise<server_response> => {
+    const opts = {
+        method:PUT,
+    }
+    const result = await fetch(`${root}comments/${id}/${new_content}`, opts)
+    const response:server_response = await result.json()
+
+
+    if(successful(response)){
+        swal_success(response)
+        .then(()=>{
+            window.location.reload()
+        })
+    }else{
+        swal_error(response)
+    }
+
+    return response
+}
+export const delete_comment = async (id:string):Promise<server_response> => {
+    const opts = {
+        method:DELETE,
+    }
+    const result = await fetch(root+'comments/'+id, opts)
+    const response:server_response = await result.json()
+
+    if(successful(response)){
+        swal_success(response).then(()=>{window.location.reload()})
+    }else{
+        swal_error(response)
+    }
+
+    console.log(response)
     return response
 }
 // votes

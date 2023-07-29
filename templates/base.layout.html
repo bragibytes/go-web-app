@@ -15,43 +15,46 @@
     {{block "style" .}}{{end}}
 </head>
 <body>
+
     {{template "navbar" .Client}}
     {{block "content" .}}{{end}}
     {{template "footer" .Client}}
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="/static/scripts/dist/bundle.js"></script>
     {{block "scripts" .}}{{end}}
 </body>
 </html>
 {{end}}
+
 {{define "chemical"}}
 <input type="hidden" id="json-data" value="{{.}}">
 {{end}}
 
 
 {{define "voting"}}
-<div class="vote-box">
+<div class="vote-box z-depth-0">
     {{if .UserHasVoted .GetClient.ID}}
         {{if .IsUpvote .GetClient.ID}}
 
-        <a class="right vote btn-small orange" 
+        <a class="right vote btn-floating orange" 
         name="up" value="1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
             <i class="material-icons">arrow_upward</i>
         </a>
 
-        <a class="left vote btn-small gray darken-2" 
+        <a class="left vote btn-floating" 
         name="down" value="-1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
             <i class="material-icons">arrow_downward</i>
         </a>
 
         {{else}}
 
-        <a class="right vote btn-small gray darken-2" 
+        <a class="right vote btn-floating" 
         name="up" value="1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
             <i class="material-icons">arrow_upward</i>
         </a>
 
-        <a class="left vote btn-small purple" 
+        <a class="left vote btn-floating purple" 
         name="down" value="-1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
             <i class="material-icons">arrow_downward</i>
         </a>
@@ -60,16 +63,146 @@
 
     {{else}}
 
-    <a class="right vote btn-small" 
+    <a class="right vote btn-floating" 
     name="up" value="1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
         <i class="material-icons">arrow_upward</i>
     </a>
 
-    <a class="left vote btn-small" 
+    <a class="left vote btn-floating" 
     name="down" value="-1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
         <i class="material-icons">arrow_downward</i>
     </a>
 
     {{end}}
+</div>
+{{end}}
+
+
+{{define "navbar"}}
+<nav class="row teal darken-1 nav-wrapper">
+    <div class="container">
+      <a href="/" class="brand-logo left hide-on-small-only tenor">ThoughtSea</a>
+      <ul id="nav-mobile" class="right">
+          <li>{{template "auth-buttons" .Authenticated}}</li>
+          <li class="gloria">{{.Name}}</li>
+          <li>{{template "auth-toggle" .Authenticated}}</li>
+      </ul>
+    </div>
+  </nav>
+{{end}}
+
+{{define "auth-toggle"}}
+  {{if .}}
+  <i class="material-icons">sentiment_very_satisfied</i>
+  {{else}}
+  <i class="material-icons">sentiment_very_dissatisfied</i>
+  {{end}}
+{{end}}
+
+{{define "auth-buttons"}}
+  <div id="auth-buttons">
+    <ul>
+      {{if .}}
+      <li><a href="/profile" class="btn-small white-text">Profile</a></li>
+      <li><a id="logout-button" class="btn-small red lighten-2 white-text">Logout</a></li>
+      {{else}}
+      <li><a id="login-button" class="btn-small" href="#!">Log In</a></li>
+      <li><a id="register-button" class="btn-small" href="#!">Sign Up</a></li>
+      {{end}}
+    </ul>
+  </div>
+{{end}}
+
+
+{{define "footer"}}
+<footer class="page-footer">
+    <div class="container">
+      <div class="row">
+        <p class="footer-copyright">
+          © 2023 ThoughtSea llc
+          <a href="https://github.com/dedpidgon/go-web-app" class="btn right">
+            <i class="fab fa-github"></i>
+          </a>
+        </p>
+      </div>
+    </div>
+  </footer>
+{{end}}
+
+{{define "author-name"}}
+    {{if eq .AuthorName "deleted"}}
+    <a href="#!" class="gloria orange-text text-darken-3">
+        by : <span class="red-text">(deleted)</span>
+    </a>
+    {{else}}
+    <a href="/profile/{{.AuthorID.Hex}}" class="gloria orange-text text-darken-3">
+        by : {{.AuthorName}}
+    </a>
+    {{end}}
+{{end}}
+
+{{define "comment-list"}}
+<div class="container full-width">
+    <div class="row">
+        {{range .}}
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content grey lighten-4">
+                    <span class="yellow darken-2 col s12">
+                        <i class="material-icons left">comment</i>
+                        {{if .GetClient.Authenticated}}
+                            {{if eq .GetClient.ID .AuthorID}}
+
+                            <!-- update & delete -->
+                            <i
+                            comment_id="{{.ID.Hex}}" current_content="{{.Content}}"
+                             class="material-icons comment-config right"
+                            >settings</i>
+
+                            {{end}}
+                        {{end}}
+                    </span>
+                    <p class="content">{{.Content}}</p>
+                </div>
+                <div class="card-action grey lighten-3">
+                    {{if .GetClient.Authenticated}}
+                    {{template "voting" .}}
+                    {{end}}
+                    <div class="center author-tag">
+                        <span>{{.DateString}}</span>
+                        {{template "author-name" .}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}
+
+{{define "post-list"}}
+<div class="container full-width">
+    <div class="row">
+        {{range .}}
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content grey lighten-4">
+                    <a href="/post/{{.ID.Hex}}"><span class="card-title post-title blue lighten-2 white-text title center-align">{{.Title}}</span></a>
+                    <p class="content truncate blue lighten-5">{{.Content}}</p>
+                    {{if gt (len .Comments) 0}}<span class="right"><i class="material-icons green-text">comment</i></span>{{end}}
+                </div>
+                <div class="card-action grey lighten-3">
+                    {{if .GetClient.Authenticated}}
+                    {{template "voting" .}}
+                    {{end}}
+                    <div class="center author-tag">
+                        <span>created : {{.DateString}}</span>
+                        {{template "author-name" .}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{end}}
+    </div>
 </div>
 {{end}}

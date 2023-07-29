@@ -59,7 +59,7 @@ func (u *User) UpdateFriend(f *User) {
 }
 
 func (u *User) name_is_restricted() bool {
-	restricted_names := []string{"_id", "name", "email", "password", "confirm", "admin", "deleted"}
+	restricted_names := []string{"_id", "name", "email", "password", "confirm", "admin", "deleted", "anonymous"}
 	for _, name := range restricted_names {
 		if name == strings.ToLower(u.Name) {
 			return true
@@ -99,7 +99,7 @@ func (u *User) Save() error {
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()
 	u.Stats = new_stats()
-
+	u.Name = strings.ToLower(u.Name)
 	res, err := users_collection.InsertOne(ctx, u)
 	u.ID = res.InsertedID.(primitive.ObjectID)
 	return err
@@ -185,7 +185,7 @@ func (u *User) GetClient() *config.ClientData {
 }
 
 func (u *User) Exists() bool {
-	if err := users_collection.FindOne(ctx, bson.M{"name": u.Name}).Decode(&u); err != nil {
+	if err := users_collection.FindOne(ctx, bson.M{"name": strings.ToLower(u.Name)}).Decode(&u); err != nil {
 		return false
 	}
 	return true
@@ -202,4 +202,23 @@ func (u *User) AsJsonString() string {
 
 func (u *User) ClientData() *config.ClientData {
 	return config.Client
+}
+
+func (u *User) Posts() []*Post {
+	var posts []*Post
+	filter := bson.M{
+		"_author": u.ID,
+	}
+	cur, _ := posts_collection.Find(ctx, filter)
+	cur.All(ctx, &posts)
+	return posts
+}
+func (u *User) Comments() []*Comment {
+	var comments []*Comment
+	filter := bson.M{
+		"_author": u.ID,
+	}
+	cur, _ := comments_collection.Find(ctx, filter)
+	cur.All(ctx, &comments)
+	return comments
 }

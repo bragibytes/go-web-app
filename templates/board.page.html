@@ -11,5 +11,22 @@
     </div>
 {{end}}
 
+{{ define "post-creator"}}
+<form id="post-creator" class="row">
+    <div class="input-field col s12">
+        <input name="title" id="post_title" type="text" class="validate">
+        <label for="post_title">Title</label>
+    </div>
+    <div class="input-field col s12">
+        <textarea name="content" id="post_content" class="materialize-textarea"></textarea>
+        <label for="post_content">Content</label>
+    </div>
+    <button class="btn waves-effect waves-light" type="submit">Submit
+        <i class="material-icons right">send</i>
+    </button>
+</form>
+{{end}}
+
+
 
 

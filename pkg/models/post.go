@@ -15,7 +15,6 @@ type Post struct {
 	ID         primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 	AuthorID   primitive.ObjectID `json:"_author" bson:"_author"`
 	AuthorName string             `json:"author" bson:"author"`
-	HasAuthor  bool               `json:"has_author" bson:"has_author"`
 	Title      string             `json:"title" bson:"title,omitempty" validate:"required" min:"3" max:"200"`
 	Content    string             `json:"content" bson:"content,omitempty" validate:"required" min:"5" max:"10000"`
 	CreatedAt  time.Time          `json:"created_at" bson:"created_at"`
@@ -35,7 +34,8 @@ func (p *Post) UpdateFriend(f *Post) {
 }
 
 func (p *Post) DateString() string {
-	return p.CreatedAt.Format("3:04PM January 2 2006")
+	loc, _ := time.LoadLocation("America/Los_Angeles")
+	return p.CreatedAt.In(loc).Format("3:04PM January 2 2006")
 }
 
 func (p *Post) exists() bool {
@@ -71,7 +71,6 @@ func (p *Post) Save() error {
 	p.AuthorName = config.Client.Name
 	p.AuthorID = config.Client.ID
 
-	p.HasAuthor = true
 	p.Votes = make([]*Vote, 0)
 	p.CreatedAt = time.Now()
 	p.UpdatedAt = time.Now()

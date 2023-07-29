@@ -2,3 +2,4 @@
 /templates/static/scripts/node_modules
 .idea
 .air.toml
+.gitignore

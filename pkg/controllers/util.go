@@ -7,18 +7,26 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var u *user_controller
-var p *post_controller
-var c *comment_controller
+var user_control *user_controller
+var post_control *post_controller
+var comment_control *comment_controller
+var view_control *view_controller
+var email_control *email_controller
+var token_control *token_controller
 
 func Handle(r *gin.Engine) {
-	u = &user_controller{}
-	p = &post_controller{}
-	c = &comment_controller{}
 
-	u.use(r.Group("/api/users"))
-	p.use(r.Group("/api/posts"))
-	c.use(r.Group("/api/comments"))
+	user_control = &user_controller{}
+	post_control = &post_controller{}
+	comment_control = &comment_controller{}
+	view_control = &view_controller{}
+	email_control = new_email_controller()
+	token_control = new_token_controller()
+
+	user_control.use(r.Group("/api/users"))
+	post_control.use(r.Group("/api/posts"))
+	comment_control.use(r.Group("/api/comments"))
+	view_control.use(r)
 }
 
 func save_session(c *gin.Context, id primitive.ObjectID, name string) error {

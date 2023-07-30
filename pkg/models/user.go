@@ -42,6 +42,8 @@ type User struct {
 	Bio             string             `json:"bio,omitempty" bson:"bio,omitempty"`
 	CreatedAt       time.Time          `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt       time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
+	EmailPublic     bool               `json:"email_public" bson:"email_public"`
+	Verified        bool               `json:"verified" bson:"verified"`
 
 	Stats *stats `json:"stats,omitempty" bson:"stats,omitempty"`
 }
@@ -87,6 +89,13 @@ func (u *User) Valid() []string {
 	return validation_errors
 }
 
+func (u *User) Verify() error {
+	filter := bson.M{"_id": u.ID}
+	update := bson.M{"$set": bson.M{"verified": true}}
+	_, err := users_collection.UpdateOne(ctx, filter, update)
+	return err
+}
+
 // Create
 func (u *User) Save() error {
 
@@ -96,10 +105,14 @@ func (u *User) Save() error {
 	}
 	u.Password = string(hashedPassword)
 	// save to database
+
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()
 	u.Stats = new_stats()
 	u.Name = strings.ToLower(u.Name)
+	u.EmailPublic = false
+	u.Verified = false
+
 	res, err := users_collection.InsertOne(ctx, u)
 	u.ID = res.InsertedID.(primitive.ObjectID)
 	return err
@@ -221,4 +234,13 @@ func (u *User) Comments() []*Comment {
 	cur, _ := comments_collection.Find(ctx, filter)
 	cur.All(ctx, &comments)
 	return comments
+}
+
+func (u *User) UpdatePassword(new_password string) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(new_password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	u.Password = string(hashedPassword)
+	return nil
 }

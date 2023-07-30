@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/dedpidgon/go-web-app/pkg/config"
 	"github.com/dedpidgon/go-web-app/pkg/models"
@@ -22,6 +23,8 @@ func (uc *user_controller) use(r *gin.RouterGroup) {
 	r.DELETE("/", uc.delete)
 	r.POST("/auth", uc.login)
 	r.PUT("/auth", uc.logout)
+	r.GET("/verify/:token", uc.verify)
+	r.GET("/resend/:id", uc.resend_verification)
 }
 
 // crud
@@ -44,6 +47,10 @@ func (uc *user_controller) create(c *gin.Context) {
 
 	if err := save_session(c, user.ID, user.Name); err != nil {
 		response.ServerErr(c, err)
+		return
+	}
+	if err := email_control.verify(user); err != nil {
+		response.Send(c, "info", err.Error()+" verification email not sent", user, 201)
 		return
 	}
 	response.Created(c, "user", user)
@@ -154,4 +161,57 @@ func (uc *user_controller) logout(c *gin.Context) {
 		return
 	}
 	response.OK(c, "logged out", nil)
+}
+
+func (uc *user_controller) verify(c *gin.Context) {
+	tokenString, err := url.QueryUnescape(c.Param("token"))
+	if err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	idHex, err := token_control.get_user_id(tokenString)
+	if err != nil {
+		view_control.bad_token(c)
+		fmt.Println(err.Error())
+		return
+	}
+	oid, err := primitive.ObjectIDFromHex(idHex)
+	if err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	user, err := models.GetOneUser(oid)
+	if err != nil {
+		view_control.bad_token(c)
+		fmt.Println(err.Error())
+		return
+	}
+	user.Verify()
+
+	// log user in
+	if err := save_session(c, user.ID, user.Name); err != nil {
+		view_control.bad_token(c)
+		fmt.Println(err.Error())
+		return
+	}
+	// send to profile
+	view_control.profile(c)
+}
+
+func (uc *user_controller) resend_verification(c *gin.Context) {
+	oid, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	user, err := models.GetOneUser(oid)
+	if err != nil {
+		response.NotFound(c, "user", err.Error())
+		return
+	}
+	if err := email_control.verify(user); err != nil {
+		response.ServerErr(c, err)
+		return
+	}
+	response.OK(c, "check your email", nil)
 }

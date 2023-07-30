@@ -205,7 +205,7 @@ export const update_post = async (id:string, data:post):Promise<server_response>
     return response
 }
 // comments
-export const create_comment = async (data:comment):Promise<server_response> => {
+export const create_comment = async (id:string, data:comment):Promise<server_response> => {
     const opts = {
         method:POST,
         body:JSON.stringify(data),
@@ -213,7 +213,7 @@ export const create_comment = async (data:comment):Promise<server_response> => {
             "Content-Type":"application/json"
         }
     }
-    const result = await fetch(root+"comments", opts)
+    const result = await fetch(root+"comments/"+id, opts)
     const response:server_response = await result.json()
 
     if(successful(response)){

@@ -4,9 +4,12 @@ export const element_exists = (id:string):boolean => {
     return element !== null ? true:false;
 }
 
-export const json_data = ():any => {
-    const ele = document.getElementById("json-data") as HTMLInputElement
-    const strData = ele.value as string
-    const obj = JSON.parse(strData)
-    return obj
+export const chemical_x = ():any => {
+    if (element_exists('json-data')) {
+        const hidden_package = document.getElementById("json-data") as HTMLInputElement;
+        const dataStrBase64 = hidden_package.value as string;
+        const dataStr = atob(dataStrBase64);
+        const dataObj = JSON.parse(dataStr);
+        return dataObj;
+    }
 }

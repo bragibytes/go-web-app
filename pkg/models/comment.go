@@ -11,16 +11,17 @@ import (
 )
 
 type Comment struct {
-	ID         primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	AuthorID   primitive.ObjectID `json:"_author" bson:"_author"`
-	AuthorName string             `json:"author" bson:"author"`
-	Parent     primitive.ObjectID `json:"_parent" bson:"_parent"`
-	Content    string             `json:"content" bson:"content"`
-	CreatedAt  time.Time          `json:"created_at" bson:"created_at"`
-	UpdatedAt  time.Time          `json:"updated_at" bson:"updated_at"`
-	Score      int32              `json:"score" bson:"-"`
-	Votes      []*Vote            `json:"-" bson:"votes"`
-	OK         string             `json:"-" bson:"-"`
+	ID             primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	AuthorID       primitive.ObjectID `json:"_author" bson:"_author"`
+	AuthorName     string             `json:"author" bson:"author"`
+	Parent         primitive.ObjectID `json:"_parent" bson:"_parent"`
+	Content        string             `json:"content" bson:"content"`
+	CreatedAt      time.Time          `json:"created_at" bson:"created_at"`
+	UpdatedAt      time.Time          `json:"updated_at" bson:"updated_at"`
+	Score          int32              `json:"score" bson:"-"`
+	Votes          []*Vote            `json:"-" bson:"votes"`
+	OK             string             `json:"-" bson:"-"`
+	HasBeenUpdated bool               `json:"has_been_updated" bson:"has_been_updated"`
 }
 
 // func (c *Comment) UpdateFriend(other_comment *Comment) {
@@ -37,6 +38,7 @@ func (c *Comment) Save() error {
 
 	c.CreatedAt = time.Now()
 	c.UpdatedAt = time.Now()
+	c.HasBeenUpdated = false
 	res, err := comments_collection.InsertOne(ctx, c)
 	if err != nil {
 		return err
@@ -85,6 +87,7 @@ func (c *Comment) Update() error {
 	}
 
 	c.OK = "successfully updated comment"
+	c.HasBeenUpdated = true
 	return nil
 }
 func (c *Comment) Delete() error {
@@ -93,7 +96,7 @@ func (c *Comment) Delete() error {
 		return err
 	}
 
-	c.OK = "successfully deleted comment " + c.ID.Hex()
+	c.OK = "successfully deleted comment"
 	return err
 }
 

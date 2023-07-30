@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/dedpidgon/go-web-app/pkg/render"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/dedpidgon/go-web-app/pkg/config"
@@ -59,8 +58,6 @@ func main() {
 	app.Use(config.SetClientData())
 
 	controllers.Handle(app)
-	// game.Handle(app)
-	render.Handle(app)
 
 	fmt.Println("Server listening on port ", os.Getenv("PORT"))
 	app.Run(os.Getenv("PORT"))

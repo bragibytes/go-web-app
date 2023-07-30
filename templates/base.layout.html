@@ -1,5 +1,5 @@
 {{define "base"}}
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles/index.css"/>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     {{block "style" .}}{{end}}
 </head>
 <body>
@@ -33,28 +34,30 @@
 
 
 {{define "voting"}}
-<div class="vote-box z-depth-0">
+<div 
+class="vote-box"
+>
     {{if .UserHasVoted .GetClient.ID}}
         {{if .IsUpvote .GetClient.ID}}
 
-        <a class="right vote btn-floating orange" 
+        <a class="vote btn-small orange" 
         name="up" value="1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
             <i class="material-icons">arrow_upward</i>
         </a>
 
-        <a class="left vote btn-floating" 
+        <a class="vote btn-small" 
         name="down" value="-1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
             <i class="material-icons">arrow_downward</i>
         </a>
 
         {{else}}
 
-        <a class="right vote btn-floating" 
+        <a class="vote btn-small" 
         name="up" value="1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
             <i class="material-icons">arrow_upward</i>
         </a>
 
-        <a class="left vote btn-floating purple" 
+        <a class="vote btn-small purple" 
         name="down" value="-1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
             <i class="material-icons">arrow_downward</i>
         </a>
@@ -63,12 +66,12 @@
 
     {{else}}
 
-    <a class="right vote btn-floating" 
+    <a class="vote btn-small" 
     name="up" value="1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
         <i class="material-icons">arrow_upward</i>
     </a>
 
-    <a class="left vote btn-floating" 
+    <a class="vote btn-small" 
     name="down" value="-1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
         <i class="material-icons">arrow_downward</i>
     </a>
@@ -79,19 +82,19 @@
 
 
 {{define "navbar"}}
-<nav class="row teal darken-1 nav-wrapper">
+<nav class="row blue darken-3 nav-wrapper">
     <div class="container">
       <a href="/" class="brand-logo left hide-on-small-only tenor">ThoughtSea</a>
       <ul id="nav-mobile" class="right">
           <li>{{template "auth-buttons" .Authenticated}}</li>
           <li class="gloria">{{.Name}}</li>
-          <li>{{template "auth-toggle" .Authenticated}}</li>
+          <li>{{template "status-face" .Authenticated}}</li>
       </ul>
     </div>
   </nav>
 {{end}}
 
-{{define "auth-toggle"}}
+{{define "status-face"}}
   {{if .}}
   <i class="material-icons">sentiment_very_satisfied</i>
   {{else}}
@@ -100,7 +103,7 @@
 {{end}}
 
 {{define "auth-buttons"}}
-  <div id="auth-buttons">
+<div id="auth-buttons">
     <ul>
       {{if .}}
       <li><a href="/profile" class="btn-small white-text">Profile</a></li>
@@ -132,7 +135,7 @@
 {{define "author-name"}}
     {{if eq .AuthorName "deleted"}}
     <a href="#!" class="gloria orange-text text-darken-3">
-        by : <span class="red-text">(deleted)</span>
+        by : <span class="red-text">deleted</span>
     </a>
     {{else}}
     <a href="/profile/{{.AuthorID.Hex}}" class="gloria orange-text text-darken-3">
@@ -142,7 +145,7 @@
 {{end}}
 
 {{define "comment-list"}}
-<div class="container full-width">
+<div class="container full-width comment-list">
     <div class="row">
         {{range .}}
         <div class="col s12 m6">
@@ -181,6 +184,7 @@
 {{end}}
 
 {{define "post-list"}}
+
 <div class="container full-width">
     <div class="row">
         {{range .}}
@@ -192,17 +196,28 @@
                     {{if gt (len .Comments) 0}}<span class="right"><i class="material-icons green-text">comment</i></span>{{end}}
                 </div>
                 <div class="card-action grey lighten-3">
-                    {{if .GetClient.Authenticated}}
-                    {{template "voting" .}}
-                    {{end}}
-                    <div class="center author-tag">
+                    <div class="center">
+                        {{template "score" .Score}}
                         <span>created : {{.DateString}}</span>
                         {{template "author-name" .}}
                     </div>
+                    {{if .GetClient.Authenticated}}
+                    {{template "voting" .}}
+                    {{end}}
                 </div>
             </div>
         </div>
         {{end}}
     </div>
 </div>
+{{end}}
+
+{{define "score"}}
+{{$color := "grey-text"}}
+    {{if lt . 0}}
+        {{$color = "red-text"}}
+    {{else if gt . 0}}
+        {{$color = "green-text"}}
+    {{end}}
+<span class="{{$color}}">score : {{.}}</span>
 {{end}}

@@ -1,7 +1,7 @@
 import Swal from "sweetalert2"
-import { comment, post } from "../interfaces";
+import { comment } from "../interfaces";
 import { create_comment, update_comment, delete_comment } from "../api";
-import { element_exists, json_data } from "./config";
+import { element_exists} from "./config";
 
 const creator = "comment-creator";
 const config = "comment-config";
@@ -10,7 +10,8 @@ const config_elements = document.getElementsByClassName(config)
 
 
 const comment_creator_handler = () => {
-    const data = json_data() as post
+    const ele = document.getElementById(creator)
+    const _parent = ele?.getAttribute('parent') as string
     const on_click = (e:Event) => {
         e.preventDefault()
         Swal.fire({
@@ -26,22 +27,18 @@ const comment_creator_handler = () => {
             showCancelButton: true,
             preConfirm: async () => {
                 const content_input = Swal.getPopup()!.querySelector("#content") as HTMLInputElement;
-                // Retrieve user input and handle data
-                const content: string = content_input ? content_input.value:""
-                // Do something with the newUsername and newEmail, e.g., send it to the server
+                const content: string = content_input.value
                 const new_comment:comment = {
                     content:content,
-                    _parent: data._id
                 }
                 console.log(new_comment)
-                console.log(data._id)
-                create_comment(new_comment)
+                create_comment(_parent, new_comment)
                 
             },
         });
     }
 
-    document.getElementById(creator)!.addEventListener("click", on_click)
+    ele!.addEventListener("click", on_click)
 }
 
 
@@ -75,14 +72,13 @@ const run = () => {
                     const new_content = content_input.value
                     console.log("going to update comment with new content of --- "+new_content)
                     update_comment(comment_id, new_content.trim())
-                }
-              }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.cancel) {
-                  // Delete comment
-                  console.log("deleting comment ", comment_id)
-                  delete_comment(comment_id)
-                }
-              })
+                }}).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.cancel) {
+                    // Delete comment
+                    console.log("deleting comment ", comment_id)
+                    delete_comment(comment_id)
+                    }
+                })
         })
     })
 }

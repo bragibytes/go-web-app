@@ -7,9 +7,10 @@ const delete_button_element = document.getElementById(delete_button) as HTMLButt
 import Swal from "sweetalert2"
 import {update_user, delete_user} from "../api";
 import {user} from "../interfaces"
-import { element_exists } from "./config";
+import { element_exists, chemical_x } from "./config";
 
 const update_button_handler = () => {
+    const data = chemical_x() as user
     const on_click = () => {
         // Show SweetAlert2 modal with input fields
         Swal.fire({

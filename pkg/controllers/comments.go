@@ -13,7 +13,7 @@ import (
 type comment_controller struct{}
 
 func (cc *comment_controller) use(r *gin.RouterGroup) {
-	r.POST("/", cc.create)
+	r.POST("/:id", cc.create)
 	r.GET("/", cc.get_all)
 	r.GET("/:id", cc.get_one)
 	r.PUT("/:id/:new_content", cc.update)
@@ -21,11 +21,17 @@ func (cc *comment_controller) use(r *gin.RouterGroup) {
 	r.POST("/vote", cc.vote)
 }
 func (cc *comment_controller) create(c *gin.Context) {
+	oid, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		response.BadReq(c, err)
+		return
+	}
 	var comment *models.Comment
 	if err := c.ShouldBindJSON(&comment); err != nil {
 		response.BadReq(c, err)
 		return
 	}
+	comment.Parent = oid
 	if err := comment.Save(); err != nil {
 		response.ServerErr(c, err)
 		return

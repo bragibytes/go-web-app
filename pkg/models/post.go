@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"time"
@@ -12,15 +13,17 @@ import (
 )
 
 type Post struct {
-	ID         primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	AuthorID   primitive.ObjectID `json:"_author" bson:"_author"`
-	AuthorName string             `json:"author" bson:"author"`
-	Title      string             `json:"title" bson:"title,omitempty" validate:"required" min:"3" max:"200"`
-	Content    string             `json:"content" bson:"content,omitempty" validate:"required" min:"5" max:"10000"`
-	CreatedAt  time.Time          `json:"created_at" bson:"created_at"`
-	UpdatedAt  time.Time          `json:"updated_at" bson:"updated_at"`
-	Votes      []*Vote            `json:"-" bson:"votes"`
-	OK         string             `json:"-" bson:"-"`
+	ID             primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	AuthorID       primitive.ObjectID `json:"_author" bson:"_author"`
+	AuthorName     string             `json:"author" bson:"author"`
+	Title          string             `json:"title" bson:"title,omitempty" validate:"required" min:"3" max:"200"`
+	Content        string             `json:"content" bson:"content,omitempty" validate:"required" min:"5" max:"10000"`
+	CreatedAt      time.Time          `json:"created_at" bson:"created_at"`
+	UpdatedAt      time.Time          `json:"updated_at" bson:"updated_at"`
+	Votes          []*Vote            `json:"-" bson:"votes"`
+	OK             string             `json:"-" bson:"-"`
+	Tags           []string           `json:"tags" bson:"tags,omitempty"`
+	HasBeenUpdated bool               `json:"has_been_updated" bson:"has_been_updated"`
 }
 
 func (p *Post) UpdateFriend(f *Post) {
@@ -74,6 +77,7 @@ func (p *Post) Save() error {
 	p.Votes = make([]*Vote, 0)
 	p.CreatedAt = time.Now()
 	p.UpdatedAt = time.Now()
+	p.HasBeenUpdated = false
 	res, err := posts_collection.InsertOne(ctx, p)
 	if err != nil {
 		return err
@@ -93,6 +97,18 @@ func GetAllPosts() ([]*Post, error) {
 		return posts, err
 	}
 
+	sort_posts(posts)
+	return posts, nil
+}
+func GetAdminPosts() ([]*Post, error) {
+	var posts []*Post
+	cur, err := posts_collection.Find(ctx, bson.M{"name": "admin"})
+	if err != nil {
+		return posts, err
+	}
+	if err = cur.All(ctx, &posts); err != nil {
+		return posts, err
+	}
 	sort_posts(posts)
 	return posts, nil
 }
@@ -124,7 +140,9 @@ func (p *Post) Update() error {
 	if err != nil {
 		return err
 	}
+
 	p.OK = "successfully updated post"
+	p.HasBeenUpdated = true
 	return nil
 }
 func (p *Post) Delete() error {
@@ -136,12 +154,8 @@ func (p *Post) Delete() error {
 	if err != nil {
 		return err
 	}
-	if _, err = votes_collection.DeleteMany(ctx, bson.M{"_parent": p.ID}); err != nil {
-		return err
-	}
 	update := bson.M{"$set": bson.M{
-		"has_parent": false,
-		"_parent":    primitive.NilObjectID,
+		"_parent": primitive.NilObjectID,
 	}}
 	filter = bson.M{"_parent": p.ID}
 	_, err = comments_collection.UpdateMany(ctx, filter, update)
@@ -203,12 +217,12 @@ func (p *Post) GetClient() *config.ClientData {
 	return config.Client
 }
 
-func (p *Post) AsJsonString() string {
+func (p *Post) Base64() string {
 	b, err := json.Marshal(p)
 	if err != nil {
 		return ""
 	}
-	return string(b)
+	return base64.StdEncoding.EncodeToString(b)
 }
 
 // template data

@@ -3,9 +3,9 @@ import {
     create_post,
     update_post,
     delete_post
- } from "../api";
+} from "../api";
 import { post, server_response } from "../interfaces";
-import { element_exists, json_data } from "./config";
+import { element_exists, chemical_x } from "./config";
 
 
 const post_creator = "post-creator"
@@ -47,17 +47,17 @@ const post_creator_handler = () => {
     post_creator_element.addEventListener('submit', on_submit)
 }
 const post_updater_handler = () => {
-   
+    const dataObj = chemical_x()
     const on_click = async (e:Event) => {
         e.preventDefault();
-        const data = json_data() as post;
+        // get post id
         Swal.fire({
             title: "Update Post",
             html: `
                 <div class="container">
                     <div class="row">
-                        <input id="title" class="swal2-input" placeholder="New Title">
-                        <textarea id="content" class="swal2-input" placeholder="New Content"></textarea>
+                        <input id="title" class="swal2-input" value="${dataObj.title}" />
+                        <textarea id="content" class="swal2-input">${dataObj.content}</textarea>
                     </div>
                 </div>
             `,
@@ -74,7 +74,7 @@ const post_updater_handler = () => {
                     title:new_title,
                     content:new_content,
                 }
-                update_post(data._id! ,post_update)
+                update_post(dataObj._id! ,post_update)
             },
         });
     }

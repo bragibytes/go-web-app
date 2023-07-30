@@ -388,10 +388,6 @@ th {
   font-family: "Gloria Hallelujah", cursive;
 }
 
-#logout-button {
-  cursor: pointer;
-}
-
 .full-width {
   width: 100vw;
   max-width: 100%;
@@ -405,17 +401,23 @@ th {
 .title {
   padding: 1rem;
   font-family: "Tenor Sans", sans-serif;
+  margin-top: 0;
 }
 
 .content {
   font-size: 1.2rem;
   font-family: "Tenor Sans", sans-serif;
   padding: 1rem;
+  padding-top: 0rem;
   border-radius: 5%;
 }
 
-.vote-box {
-  margin-top: 2rem;
+.post-page {
+  margin-top: -18px;
+}
+
+.btn-small {
+  background-color: grey;
 }
 
 /*# sourceMappingURL=index.css.map */

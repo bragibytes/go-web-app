@@ -1,5 +1,7 @@
 .env
 /templates/static/scripts/node_modules
-.idea
+/.idea
 .air.toml
 .gitignore
+/tmp
+/node_modules

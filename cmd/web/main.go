@@ -13,6 +13,7 @@ import (
 	"github.com/dedpidgon/go-web-app/pkg/config"
 	"github.com/dedpidgon/go-web-app/pkg/controllers"
 	"github.com/dedpidgon/go-web-app/pkg/models"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -57,8 +58,12 @@ func main() {
 	app.Use(sessions.Sessions("user-session", store))
 	app.Use(config.SetClientData())
 
+	cors_config := cors.DefaultConfig()
+	cors_config.AllowOrigins = []string{"https://localhost:10000"}
+	app.Use(cors.New(cors_config))
+
 	controllers.Handle(app)
 
 	fmt.Println("Server listening on port ", os.Getenv("PORT"))
-	app.Run(os.Getenv("PORT"))
+	app.RunTLS(os.Getenv("PORT"), "cert.pem", "key.pem")
 }

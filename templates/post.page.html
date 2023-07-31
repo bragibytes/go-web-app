@@ -18,12 +18,12 @@
     
             {{if and $logged_in $mine}}
                 <a 
-                class="btn-large blue accent-4 waves-effect" id="post-updater">Update</a>
-                <a class="btn-large red waves-effect" id="post-deleter" value="{{.P.ID.Hex}}">Delete</a>
+                class="btn blue accent-4 waves-effect" id="post-updater">Update</a>
+                <a class="btn red waves-effect" id="post-deleter" value="{{.P.ID.Hex}}">Delete</a>
             {{end}}
             {{if $logged_in}}
             <a 
-            class="btn-large yellow darken-2 black-text" 
+            class="btn yellow darken-2 black-text" 
             id="comment-creator" parent="{{.P.ID.Hex}}">
                 Comment <i class="material-icons right">comment</i>
             </a>  

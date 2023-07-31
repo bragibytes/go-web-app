@@ -1,23 +1,33 @@
 {{template "base" .}}
 
 {{define "content"}}
+{{template "chemical" .X}}
 <div class="row profile-page">
     <div class="container">
         <div class="row">
-            <div>
+            <div class="col s8">
                 <h1 class="gloria">{{.U.Name}}</h1>
                 <h3 class="gloria">{{.U.Email}}</h3>
                 {{if and .Client.Authenticated (eq .Client.ID .U.ID)}}
                 <span>verified : {{.U.Verified}} {{if not .U.Verified}} <a href="/api/users/resend/{{.U.ID.Hex}}" class="btn">Resend <i class="material-icons right">send</i></a> {{end}}</span>
                 {{end}}
             </div>
-            <p class="tenor">{{.U.Bio}}</p>
+            {{if eq .U.Bio ""}}
+            <form id="bio-creator" class="col s4">
+                <textarea class="materialize-textarea" name="bio" placeholder="Tell us about yourself..."></textarea>
+                <button class="btn waves-effect waves-light" type="submit">Save
+                    <i class="material-icons right">send</i>
+                </button>
+            </form>
+            {{else}}
+            <p class="bio col s4">{{.U.Bio}}</p>
+            {{end}}
         </div>
         {{if .Client.Authenticated}}
             {{if eq .Client.ID .U.ID}}
                 <div class="row">
-                    <button class="btn waves-effect" id="update-button">Update</button>
-                    <button class="btn waves-effect" id="delete-button">Delete</button>
+                    <a class="btn waves-effect blue lighten-1" id="update-button">Update <i class="material-icons right">update</i></a>
+                    <a class="btn waves-effect red" id="delete-button">Delete <i class="material-icons right">delete</i></a>
                 </div>
             {{end}}
         {{end}}

@@ -24,6 +24,7 @@ type Post struct {
 	OK             string             `json:"-" bson:"-"`
 	Tags           []string           `json:"tags" bson:"tags,omitempty"`
 	HasBeenUpdated bool               `json:"has_been_updated" bson:"has_been_updated"`
+	Style          string             `json:"style" bson:"style"`
 }
 
 func (p *Post) UpdateFriend(f *Post) {

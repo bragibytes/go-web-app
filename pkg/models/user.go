@@ -1,6 +1,8 @@
 package models
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -44,6 +46,7 @@ type User struct {
 	UpdatedAt       time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
 	EmailPublic     bool               `json:"email_public" bson:"email_public"`
 	Verified        bool               `json:"verified" bson:"verified"`
+	OK              string             `json:"-" bson:"-"`
 
 	Stats *stats `json:"stats,omitempty" bson:"stats,omitempty"`
 }
@@ -58,6 +61,17 @@ func (u *User) UpdateFriend(f *User) {
 	if u.Bio != "" {
 		f.Bio = u.Bio
 	}
+}
+
+func (u *User) UpdateBio(bio string) error {
+	filter := bson.M{"_id": u.ID}
+	update := bson.M{"$set": bson.M{"bio": bio}}
+	if _, err := users_collection.UpdateOne(ctx, filter, update); err != nil {
+		return err
+	}
+	u.OK = "Updated the bio for " + u.Name
+	return nil
+
 }
 
 func (u *User) name_is_restricted() bool {
@@ -243,4 +257,12 @@ func (u *User) UpdatePassword(new_password string) error {
 	}
 	u.Password = string(hashedPassword)
 	return nil
+}
+
+func (u *User) Base64() string {
+	b, err := json.Marshal(u)
+	if err != nil {
+		return ""
+	}
+	return base64.StdEncoding.EncodeToString(b)
 }

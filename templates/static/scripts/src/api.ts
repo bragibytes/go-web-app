@@ -8,7 +8,7 @@ import {
 import Swal, { SweetAlertIcon, SweetAlertResult } from "sweetalert2"
 
 
-const root = "http://localhost:10000/api/"
+const root = "https://localhost:10000/api/"
 const POST = "POST"
 const GET = "GET"
 const PUT = "PUT"
@@ -143,6 +143,28 @@ export const register_user = async (user:user):Promise<server_response> => {
     }
 
     return response
+}
+export const update_user_bio = async (data:user) => {
+    const opts = {
+        method:PUT,
+        body:JSON.stringify(data),
+        headers:{
+            "Content-Type":"application/json"
+        }
+    }
+    const result = await fetch(root+"users/bio", opts)
+    const response = await result.json()
+
+    if(successful(response)){
+        swal_success(response)
+        .then(()=>{window.location.reload()})
+    }else{
+        swal_error(response)
+    }
+
+
+    return response
+
 }
 // posts
 export const create_post = async (post:post):Promise<server_response> => {

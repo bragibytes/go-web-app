@@ -20,6 +20,7 @@ func (uc *user_controller) use(r *gin.RouterGroup) {
 	r.GET("/{id}", uc.get_one)
 	r.GET("/", uc.get_all)
 	r.PUT("/", uc.update)
+	r.PUT("/bio", uc.update_bio)
 	r.DELETE("/", uc.delete)
 	r.POST("/auth", uc.login)
 	r.PUT("/auth", uc.logout)
@@ -214,4 +215,23 @@ func (uc *user_controller) resend_verification(c *gin.Context) {
 		return
 	}
 	response.OK(c, "check your email", nil)
+}
+
+func (uc *user_controller) update_bio(c *gin.Context) {
+	var user_with_bio *models.User
+	if err := c.ShouldBindJSON(&user_with_bio); err != nil {
+		response.BadReq(c, err)
+		return
+	}
+	user, err := models.GetOneUser(config.Client.ID)
+	if err != nil {
+		response.NotFound(c, "user", err.Error())
+		return
+	}
+	if err := user.UpdateBio(user_with_bio.Bio); err != nil {
+		response.ServerErr(c, err)
+		return
+	}
+
+	response.OK(c, user.OK, user)
 }

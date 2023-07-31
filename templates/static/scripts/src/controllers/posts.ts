@@ -82,9 +82,18 @@ const post_updater_handler = () => {
 }
 const post_deleter_handler = async () => {
     const on_click = (e:Event) => {
-        console.log('CLICK')
-        const data = post_deleter_element.getAttribute('value') as string
-        delete_post(data)
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            preConfirm: async () => {
+                const id = post_deleter_element.getAttribute('value') as string
+                delete_post(id)
+            }
+        })
+
     }
     post_deleter_element.addEventListener('click', on_click)
 }

@@ -39,27 +39,28 @@ class="vote-box"
 >
     {{if .UserHasVoted .GetClient.ID}}
         {{if .IsUpvote .GetClient.ID}}
+    
 
         <a class="vote btn-small orange" 
         name="up" value="1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
-            <i class="material-icons">arrow_upward</i>
+            <i class="material-icons">thumb_up</i>
         </a>
 
         <a class="vote btn-small" 
         name="down" value="-1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
-            <i class="material-icons">arrow_downward</i>
+            <i class="material-icons">thumb_down</i>
         </a>
 
         {{else}}
 
         <a class="vote btn-small" 
         name="up" value="1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
-            <i class="material-icons">arrow_upward</i>
+            <i class="material-icons">thumb_up</i>
         </a>
 
         <a class="vote btn-small purple" 
         name="down" value="-1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
-            <i class="material-icons">arrow_downward</i>
+            <i class="material-icons">thumb_down</i>
         </a>
 
         {{end}}
@@ -68,12 +69,12 @@ class="vote-box"
 
     <a class="vote btn-small" 
     name="up" value="1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
-        <i class="material-icons">arrow_upward</i>
+        <i class="material-icons">thumb_up</i>
     </a>
 
     <a class="vote btn-small" 
     name="down" value="-1" parent="{{.ID.Hex}}" model_type="{{.ModelType}}">
-        <i class="material-icons">arrow_downward</i>
+        <i class="material-icons">thumb_down</i>
     </a>
 
     {{end}}

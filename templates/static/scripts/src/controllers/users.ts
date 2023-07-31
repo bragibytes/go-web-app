@@ -1,14 +1,36 @@
+import Swal from "sweetalert2"
 const delete_button = "delete-button"
 const update_button = "update-button"
+const bio_creator = "bio-creator"
 
 const update_button_element = document.getElementById(update_button) as HTMLButtonElement
 const delete_button_element = document.getElementById(delete_button) as HTMLButtonElement
+const bio_creator_element = document.getElementById(bio_creator) as HTMLFormElement
 
-import Swal from "sweetalert2"
-import {update_user, delete_user} from "../api";
+import {update_user, delete_user, update_user_bio} from "../api";
 import {user} from "../interfaces"
 import { element_exists, chemical_x } from "./config";
 
+
+
+const bio_creator_handler = () => {
+
+    const bio = ():string => {
+        const x = bio_creator_element.querySelector("[name='bio']") as HTMLTextAreaElement
+        const n = x.value as string
+        return n
+    }
+
+    const on_submit = async (e:Event) => {
+        e.preventDefault()
+        const data:user = {
+            bio: bio()
+        }
+        update_user_bio(data)
+    }
+
+    bio_creator_element.addEventListener("submit", on_submit)
+}
 const update_button_handler = () => {
     const data = chemical_x() as user
     const on_click = () => {
@@ -18,8 +40,8 @@ const update_button_handler = () => {
             html: `
                 <div class="container">
                     <div class="row">
-                        <input id="username" class="swal2-input" placeholder="New Username">
-                        <input id="email" class="swal2-input" placeholder="New Email">
+                        <input id="username" class="swal2-input" value='${data.name}'>
+                        <input id="email" class="swal2-input" value='${data.email}'>
                     </div>
                 </div>
             `,
@@ -45,7 +67,17 @@ const update_button_handler = () => {
 }
 const delete_button_handler = () => {
     const on_click = (e:Event) => {
-        delete_user()
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            preConfirm: () => {
+                delete_user()
+            }
+        })
+        
     }
 
     delete_button_element.addEventListener("click", on_click)
@@ -57,6 +89,9 @@ const run = () => {
     if(element_exists(delete_button)){
         delete_button_handler()
     } 
+    if(element_exists(bio_creator)){
+        bio_creator_handler()
+    }
 }
 
 export default run
